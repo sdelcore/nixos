@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+if [ ! "$#" -gt 0 ]; then
+	echo "Need a server to connect to!"
+	return 1
+fi
+
+ssh -t $1 "zellij attach -c remote"
