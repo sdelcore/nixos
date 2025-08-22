@@ -136,6 +136,7 @@ in
     fd
     gcc
     glib
+    glibc
     gnumake
     jq
     killall
@@ -144,6 +145,7 @@ in
     just
     
     vagrant
+    packer
     opentofu
     ansible
   ];

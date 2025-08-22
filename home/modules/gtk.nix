@@ -4,13 +4,17 @@
   ...
 }: {
   # GTK theme configuration
-  catppuccin.gtk = {
-    enable = true;
-    gnomeShellTheme = true;
-  };
+  # Note: catppuccin.gtk has been deprecated - using manual theme configuration instead
   
   gtk = {
     enable = true;
+    theme = {
+      name = "catppuccin-macchiato-blue-standard";
+      package = pkgs.catppuccin-gtk.override {
+        accents = [ "blue" ];
+        variant = "macchiato";
+      };
+    };
     iconTheme = {
       name = "Tela-circle-dark";
       package = pkgs.tela-circle-icon-theme;

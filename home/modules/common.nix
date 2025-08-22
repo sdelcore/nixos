@@ -15,11 +15,13 @@
     ../modules/lazygit.nix
     ../modules/lazydocker.nix
     ../modules/neovim.nix
+    ../modules/opencode/default.nix
     ../modules/scripts.nix
     ../modules/ulauncher.nix
     ../modules/zsh.nix
     ../modules/zellij.nix
     ../modules/zen-browser.nix
+    ../modules/zoxide.nix
   ];
 
   # Catpuccin flavor and accent

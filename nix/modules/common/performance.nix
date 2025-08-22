@@ -30,14 +30,13 @@
 
   # Enable periodic TRIM for SSDs
   services.fstrim = {
-    enable = true;
+    enable = false;
     interval = "weekly"; # Run TRIM weekly
   };
 
   # Additional performance optimizations
   boot.kernel.sysctl = {
-    # Reduce swappiness since we have zram
-    "vm.swappiness" = 10;
+    "vm.swappiness" = 20;
     
     # Optimize for SSDs
     "vm.dirty_ratio" = 15;
@@ -49,5 +48,5 @@
 
   # CPU frequency governor - use powersave for laptops, performance for desktops
   # This can be overridden in machine-specific configs
-  powerManagement.cpuFreqGovernor = lib.mkDefault "ondemand";
+  # powerManagement.cpuFreqGovernor = lib.mkDefault "ondemand";
 }

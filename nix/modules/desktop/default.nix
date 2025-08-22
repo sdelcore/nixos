@@ -46,12 +46,16 @@
     unstable.signal-desktop
     unstable.vesktop
 
+    # browsers
+    firefox-bin
+    google-chrome
+
     # tools
     unstable.vscode.fhs
     unstable.code-cursor
-    firefox-bin
-    widevine-cdm
-    google-chrome
+    
+    # widevine-cdm # Temporarily disabled - download source is broken
+    
     prusa-slicer
     cliphist
     flameshot

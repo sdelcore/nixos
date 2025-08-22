@@ -43,30 +43,7 @@ in
 
   virtualisation.libvirt.connections."qemu:///session" = {
     domains = [
-        {
-          definition = virtLib.domain.writeXML (virtLib.domain.templates.windows
-            {
-              name = "Wurst";
-              uuid = "def734bb-e2ca-44ee-80f5-0ea5f2593aaa";
-              memory = { count = 12; unit = "GiB"; };
-              storage_vol = { pool = "default"; volume = "Wurst.qcow2"; };
-              nvram_path = /opt/vmpool/nvram/Wurst.nvram;
-              virtio_net = true;
-              virtio_drive = true;
-              virtio_video = false;
-              install_virtio = true;
-            });
-        }
-        {
-            definition = virtLib.domain.writeXML (virtLib.domain.templates.linux
-            {
-                name = "Penguin";
-                uuid = "cc7439ed-36af-4696-a6f2-1f0c4414d87e";
-                memory = { count = 8; unit = "GiB"; };
-                storage_vol = { pool = "default"; volume = "Penguin.qcow2"; };
-                virtio_video = false;
-            });
-        }
+        
       ];
     pools = [
         {

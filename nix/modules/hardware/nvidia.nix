@@ -30,20 +30,13 @@
   hardware.nvidia-container-toolkit.enable = true;
 
   environment.systemPackages = with pkgs; [
-    cudaPackages_12_2.cudatoolkit
+    cudaPackages_12_4.cudatoolkit
     egl-wayland
   ];
 
   boot.blacklistedKernelModules = [ "nouveau"];
   boot.kernelParams = [ "nouveau.modeset=0" ];
 
-  virtualisation = {
-    docker = {
-      package = pkgs.docker_27;
-      rootless.daemon.settings.features.cdi = true;
-      enableNvidia = true;
-      daemon.settings.features.cdi = true;
-    };
-  };
+  # Nvidia container support is now handled by hardware.nvidia-container-toolkit.enable above
 
 }
