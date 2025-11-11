@@ -104,7 +104,7 @@
     wf-recorder
     wlr-randr
     wlsunset
-    unstable.kdePackages.xwaylandvideobridge
+    kdePackages.xwaylandvideobridge
     mlocate
   ];
 }

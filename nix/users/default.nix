@@ -10,7 +10,7 @@
   users.users.sdelcore = {    
     isNormalUser = true;
     description = "Spencer Delcore";
-    extraGroups = [ "networkmanager" "wheel" "kvm" "libvirtd" "docker" "storage" "dialout" "seat" "video"];
+    extraGroups = [ "networkmanager" "wheel" "kvm" "libvirtd" "docker" "storage" "dialout" "seat" "video" "audio"];
     uid = 1000;
 
     shell = pkgs.zsh;

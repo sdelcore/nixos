@@ -115,6 +115,8 @@ in
     distrobox
     parallel
     sops
+    tree
+    jq
     
     # libs
     libuuid

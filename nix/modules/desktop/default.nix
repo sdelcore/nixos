@@ -52,7 +52,6 @@
 
     # tools
     unstable.vscode.fhs
-    unstable.code-cursor
     
     # widevine-cdm # Temporarily disabled - download source is broken
     
