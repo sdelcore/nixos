@@ -9,6 +9,10 @@ return {
                 'nvim-telescope/telescope-file-browser.nvim',
                 event = "VeryLazy",
                 dependencies = { 'nvim-telescope/telescope.nvim', 'nvim-lua/plenary.nvim', 'nvim-tree/nvim-web-devicons' }
+            },
+            {
+                'nvim-telescope/telescope-fzf-native.nvim',
+                dir = '~/.local/share/nvim/nix/telescope-fzf-native.nvim',
             }
         },
         -- stylua: ignore
@@ -67,11 +71,13 @@ return {
                         respect_gitignore = false,
                         hijack_netrw = true,
                         hidden = true,
-                    }
+                    },
+                    fzf = {}
                 }
             }
             require('telescope').setup(opts)
-            require("telescope").load_extension "file_browser"
+            require("telescope").load_extension("file_browser")
+            require("telescope").load_extension("fzf")
         end
 
     }

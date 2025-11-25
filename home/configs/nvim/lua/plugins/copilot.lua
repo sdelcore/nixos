@@ -1,16 +1,16 @@
 return {
     {
         "zbirenbaum/copilot.lua",
-        enabled = false,
+        enabled = true,
         event = "BufEnter",
         opts = {
-            suggestion = { enabled = false },
+            suggestion = { enabled = true, auto_trigger = true },
             panel = { enabled = false },
         },
     },
     {
         "zbirenbaum/copilot-cmp",
-        enabled = false,
+        enabled = true,
         opts = {}
     }
 }

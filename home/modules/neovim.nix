@@ -34,7 +34,9 @@ let
   treesitter-parsers = pkgs.symlinkJoin {
     name = "treesitter-parsers";
     paths = treesitterWithGrammars.dependencies;
-  }; 
+  };
+
+  telescope-fzf-native = pkgs.vimPlugins.telescope-fzf-native-nvim; 
 in
 {
   home.packages = with pkgs; [
@@ -56,6 +58,13 @@ in
 
     plugins = [
       treesitterWithGrammars
+      telescope-fzf-native
+    ];
+
+    extraPackages = with pkgs; [
+      gcc
+      cmake
+      gnumake
     ];
   };
 
@@ -75,6 +84,12 @@ in
   home.file."./.local/share/nvim/nix/nvim-treesitter/" = {
     recursive = true;
     source = treesitterWithGrammars;
+  };
+
+  # telescope-fzf-native is provided by nix to avoid build issues
+  home.file."./.local/share/nvim/nix/telescope-fzf-native.nvim/" = {
+    recursive = true;
+    source = telescope-fzf-native;
   };
 
 }
