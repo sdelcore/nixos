@@ -4,12 +4,23 @@
     virtualisation.vmVariant = {
         virtualisation.diskSize = 10 * 1024 * 1024;
         
-        #virtualisation.sharedDirectories = {
+        virtualisation.sharedDirectories = {
         #    keys = {
         #        source = "/etc/ssh";
         #        target = "/etc/ssh";
         #    };
-        #};
+
+            op-secrets = {
+                source = "$HOME/.config/op";
+                target = "/mnt/op-host";
+            };
+        };
+
+
+        # Symlink token to where opnix expects it (works in VM with shared dir)
+        systemd.tmpfiles.rules = [
+            "L /etc/opnix-token - - - - /mnt/op-host/service-account-token"
+        ];
 
         virtualisation.memorySize =  2048;
         virtualisation.cores = 3;

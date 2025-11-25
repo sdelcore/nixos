@@ -10,7 +10,10 @@
             inputs.nixpkgs.follows = "nixpkgs";
         };
         # platform
-        sops-nix.url = "github:Mic92/sops-nix";
+        opnix = {
+            url = "github:brizzbuzz/opnix";
+            inputs.nixpkgs.follows = "nixpkgs";
+        };
         nixvirt = {
             url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";
             inputs.nixpkgs.follows = "nixpkgs";
@@ -38,7 +41,7 @@
         home-manager,
         nur,
         disko,
-        sops-nix,
+        opnix,
         catppuccin,
         nixvirt,
         spicetify-nix,
@@ -50,7 +53,7 @@
         # Common modules for all systems
         commonModules = [
             nur.modules.nixos.default
-            sops-nix.nixosModules.sops
+            opnix.nixosModules.default
             nixvirt.nixosModules.default
         ];
 
@@ -77,11 +80,14 @@
             home-manager.extraSpecialArgs = extraSpecialArgs;
         };
 
+        # Primary user for all systems
+        primaryUser = "sdelcore";
+
         # System configuration factory
         mkSystem = hostname: { extraModules ? [], homeFile ? null, extraHomeSpecialArgs ? {} }:
             nixpkgs.lib.nixosSystem {
                 inherit system;
-                specialArgs = { inherit inputs; };
+                specialArgs = { inherit inputs primaryUser; };
                 modules = commonModules ++ [
                     ./nix/${hostname}.configuration.nix
                     unstableOverlay
@@ -107,6 +113,16 @@
             
             wise18 = mkSystem "wise18" {
                 extraModules = [ disko.nixosModules.disko ];
+            };
+
+            # Minimal VM for testing opnix (no home-manager, no extra modules)
+            wise18-vm = nixpkgs.lib.nixosSystem {
+                inherit system;
+                specialArgs = { inherit inputs primaryUser; };
+                modules = [
+                    opnix.nixosModules.default
+                    ./nix/wise18-vm.configuration.nix
+                ];
             };
         };
     };

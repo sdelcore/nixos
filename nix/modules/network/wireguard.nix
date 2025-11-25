@@ -1,9 +1,10 @@
 { config, pkgs, ... }:
 
 {
-  imports = [
-    ../../secrets/secrets.nix
-  ];
+  # Note: sops secrets import removed - using opnix for secrets management now
+  # imports = [
+  #   ../../secrets/secrets.nix
+  # ];
   networking.firewall = {
     allowedUDPPorts = [ 51820  ]; # Clients and peers can use the same port, see listenport
     # if packets are still dropped, they will show up in dmesg
@@ -19,18 +20,20 @@
     '';
   };
 
-  sops.secrets."wireguard/dayman/public_key" = { 
-    path = "/etc/nixos/configs/wg/wireguard-publickey.conf";
-    mode = "0600";
-  };
-  sops.secrets."wireguard/dayman/private_key" = {
-    path = "/etc/nixos/configs/wg/wireguard-privatekey.conf";
-    mode = "0600";
-  };
-  sops.secrets."wireguard/home/public_key" = {
-    path = "/etc/nixos/configs/wg/wireguard-home-publickey.conf";
-    mode = "0600";
-  };
+  # Note: sops secrets declarations removed - using opnix for secrets management now
+  # The opnix module (nix/modules/secrets/opnix.nix) now manages these secrets
+  # sops.secrets."wireguard/dayman/public_key" = {
+  #   path = "/etc/nixos/configs/wg/wireguard-publickey.conf";
+  #   mode = "0600";
+  # };
+  # sops.secrets."wireguard/dayman/private_key" = {
+  #   path = "/etc/nixos/configs/wg/wireguard-privatekey.conf";
+  #   mode = "0600";
+  # };
+  # sops.secrets."wireguard/home/public_key" = {
+  #   path = "/etc/nixos/configs/wg/wireguard-home-publickey.conf";
+  #   mode = "0600";
+  # };
 
   networking.wg-quick.interfaces = {
     wg0 = {

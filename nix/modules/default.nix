@@ -9,9 +9,9 @@ in
 
 {
   imports =
-    [ 
+    [
       ./virtualization/nix-testvm.nix
-      ./../secrets/secrets.nix
+      ./secrets/opnix.nix
     ];
   
   # Set your time zone.
@@ -114,7 +114,6 @@ in
     file
     distrobox
     parallel
-    sops
     tree
     jq
     
