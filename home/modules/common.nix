@@ -2,6 +2,7 @@
   imports = [
     ../modules/alacritty.nix
     ../modules/atuin.nix
+    ../modules/ssh.nix
     ../modules/bat.nix
     ../modules/bottom.nix
     ../modules/claude-code/default.nix

@@ -97,7 +97,29 @@
                 ] ++ extraModules;
             };
     
+        # Standalone home-manager config factory (for non-NixOS systems)
+        mkHomeConfig = username: home-manager.lib.homeManagerConfiguration {
+            pkgs = import nixpkgs {
+                inherit system;
+                config.allowUnfree = true;
+            };
+            extraSpecialArgs = { inherit username; };
+            modules = [
+                catppuccin.homeModules.catppuccin
+                ./home/headless.nix
+            ];
+        };
+
     in {
+        # Standalone home-manager configurations for non-NixOS VMs
+        # Usage: nix run home-manager/release-25.05 -- switch --flake .#headless
+        homeConfigurations = {
+            # Default config using "sdelcore" username
+            "sdelcore" = mkHomeConfig "sdelcore";
+            # Generic headless config
+            "headless" = mkHomeConfig "sdelcore";
+        };
+
         nixosConfigurations = {
             dayman = mkSystem "dayman" {
                 extraModules = [ 
