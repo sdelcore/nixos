@@ -6,7 +6,6 @@
 |------|------|-----|-----|---------|----------|
 | **dayman** | Laptop | Intel | NVIDIA | NVMe (btrfs) | TLP, Thunderbolt, Lid controls |
 | **nightman** | Desktop | AMD | NVIDIA | NVMe + 4 drives | Triple monitors, Virtualization |
-| **wise18** | Server | Intel | NVIDIA (headless) | NVMe + 3-disk RAID0 |  |
 
 ## 🚀 Features
 

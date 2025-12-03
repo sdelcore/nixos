@@ -5,6 +5,15 @@
   programs.ssh = {
     enable = true;
     addKeysToAgent = "yes";
+    forwardAgent = true;
+    # Include user-writable config for VS Code and other tools
+    includes = [ "~/.ssh/config.d/*" ];
+    matchBlocks = {
+      "nightman" = {
+        hostname = "nightman.tap";
+        user = "sdelcore";
+      };
+    };
   };
 
   # Keychain manages ssh-agent and loads keys at shell startup

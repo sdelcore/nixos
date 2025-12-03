@@ -27,7 +27,6 @@
         catppuccin.url = "github:catppuccin/nix/3ba714046ee32373e88166e6e9474d6ae6a5b734";
         # applications
         nur.url = "github:nix-community/NUR";
-        spicetify-nix.url = "github:Gerg-L/spicetify-nix";
         zen-browser = {
             url = "github:youwen5/zen-browser-flake";
             inputs.nixpkgs.follows = "nixpkgs";
@@ -44,7 +43,6 @@
         opnix,
         catppuccin,
         nixvirt,
-        spicetify-nix,
         zen-browser
     }:
     let 
@@ -122,30 +120,12 @@
 
         nixosConfigurations = {
             dayman = mkSystem "dayman" {
-                extraModules = [ 
-                    disko.nixosModules.disko
-                    spicetify-nix.nixosModules.default
-                ];
+                extraModules = [ disko.nixosModules.disko ];
                 extraHomeSpecialArgs = { inherit system; };
             };
-            
-            nightman = mkSystem "nightman" {
-                extraModules = [ spicetify-nix.nixosModules.default ];
-            };
-            
-            wise18 = mkSystem "wise18" {
-                extraModules = [ disko.nixosModules.disko ];
-            };
 
-            # Minimal VM for testing opnix (no home-manager, no extra modules)
-            wise18-vm = nixpkgs.lib.nixosSystem {
-                inherit system;
-                specialArgs = { inherit inputs primaryUser; };
-                modules = [
-                    opnix.nixosModules.default
-                    ./nix/wise18-vm.configuration.nix
-                ];
-            };
+            nightman = mkSystem "nightman" {};
+            
         };
     };
 }

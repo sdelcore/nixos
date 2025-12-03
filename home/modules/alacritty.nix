@@ -9,7 +9,7 @@
       terminal.shell.args = [
         "-l"
         "-c"
-        "zellij"
+        "zellij attach --create workspace"
       ];
 
       env = {
