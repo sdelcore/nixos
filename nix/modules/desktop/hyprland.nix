@@ -26,10 +26,8 @@
   # Enable security services
   services.gnome.gnome-keyring.enable = true;
   security.polkit.enable = true;
-  security.pam.services = {
-    hyprlock = {};
-    gdm.enableGnomeKeyring = true;
-  };
+  # Note: hyprlock PAM is configured in yubikey.nix with U2F support
+  security.pam.services.gdm.enableGnomeKeyring = true;
 
   systemd = {
     user.services.polkit-gnome-authentication-agent-1 = {

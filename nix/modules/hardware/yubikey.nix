@@ -11,12 +11,19 @@
     #home.file.".config/Yubico/u2f_keys".source = /home/nexxius/Dotfiles/.config/Yubico/u2f_keys;
   }; # End of Home Manager
   
-  # Enable Yubikey for Sudo and Login
+  # U2F authentication settings
+  security.pam.u2f = {
+    enable = true;
+    control = "sufficient";  # YubiKey OR password
+    settings.cue = true;  # Print "Please touch the device" message
+  };
+
+  # Enable YubiKey for login, sudo, and hyprlock
   security.pam.services = {
     login.u2fAuth = true;
     sudo.u2fAuth = true;
+    hyprlock.u2fAuth = true;
     gdm.enableGnomeKeyring = true;
-    u2fAuth.enableGnomeKeyring = true;
   };
   
   # Enable Yubikey-Touch-Detector

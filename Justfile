@@ -27,6 +27,18 @@ buildvm name="":
     nixos-rebuild build-vm --flake .#{{name}} --impure
     ./result/bin/run-{{name}}-vm
 
+# Test a host configuration as a VM
+testvm name="" *args="":
+    ./scripts/test-vm.sh {{args}} {{name}}
+
+# Build VM only (no run)
+testvm-build name="":
+    ./scripts/test-vm.sh --build-only {{name}}
+
+# Run VM headless with SSH access
+testvm-headless name="" port="2222":
+    ./scripts/test-vm.sh --headless --ssh-port {{port}} {{name}}
+
 deploy name="" ip="":
     nixos-rebuild boot --flake .#{{name}} --use-remote-sudo --target-host {{ip}}
     ssh {{ip}} sudo reboot now
