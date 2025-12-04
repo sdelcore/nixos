@@ -1,17 +1,9 @@
 return {
     {
-
         'williamboman/mason.nvim',
         config = function()
             require("mason").setup()
         end
-    },
-    {
-
-        'VonHeikemen/lsp-zero.nvim',
-        branch = "v4.x",
-        lazy = true,
-        config = false
     },
     {
         'hrsh7th/nvim-cmp',
@@ -19,7 +11,6 @@ return {
         dependencies = {
             { 'onsails/lspkind.nvim' },
             { 'L3MON4D3/LuaSnip' },
-            --     -- Snippet Collection (Optional)
             { 'rafamadriz/friendly-snippets' },
             { 'hrsh7th/cmp-buffer' },
             { 'hrsh7th/cmp-path' },
@@ -29,7 +20,6 @@ return {
         },
         config = function()
             local cmp = require('cmp')
-            -- local cmp_format = require('lsp-zero').cmp_format()
             local cmp_select = { behavior = cmp.SelectBehavior.Select }
             local cmp_mappings = cmp.mapping.preset.insert({
                 ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
@@ -56,8 +46,8 @@ return {
                         maxwidth = 75,
                         ellipsis_char = '...',
                         symbol_map = {
-                            Copilot = "",
-                            Supermaven = ""
+                            Copilot = "",
+                            Supermaven = ""
                         },
                     })
                 },
@@ -80,7 +70,7 @@ return {
             { 'nvim-treesitter/nvim-treesitter' },
         },
         config = function()
-            local lsp = require('lsp-zero')
+            -- Nushell treesitter parser
             local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
             parser_config.nu = {
                 install_info = {
@@ -91,6 +81,7 @@ return {
                 filetype = "nu",
             }
 
+            -- Format on save
             local format_sync_grp = vim.api.nvim_create_augroup("Format", {})
             vim.api.nvim_create_autocmd("BufWritePre", {
                 pattern = "*",
@@ -100,40 +91,76 @@ return {
                 group = format_sync_grp,
             })
 
-            local lsp_attach = function(client, bufnr)
-                local opts = { buffer = bufnr, remap = false }
-                vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-                vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-                vim.keymap.set("n", "<leader>vws", vim.lsp.buf.workspace_symbol, opts)
-                vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float, opts)
-                vim.keymap.set("n", "[d", function() vim.diagnostic.jump({ count = -1, float = true }) end, opts)
-                vim.keymap.set("n", "]d", function() vim.diagnostic.jump({ count = 1, float = true }) end, opts)
-                vim.keymap.set("n", "<leader>vca", vim.lsp.buf.code_action, opts)
-                vim.keymap.set("n", "<leader>a", vim.lsp.buf.code_action, opts)
-                vim.keymap.set("n", "<leader>vrr", vim.lsp.buf.references, opts)
-                vim.keymap.set("n", "<leader>vrn", vim.lsp.buf.rename, opts)
-                vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, opts)
-                client.server_capabilities.semanticTokensProvider = nil
-            end
-
-
-            lsp.extend_lspconfig({
+            -- Global LSP config with capabilities
+            vim.lsp.config('*', {
                 capabilities = require('cmp_nvim_lsp').default_capabilities(),
-                lsp_attach = lsp_attach,
-                float_border = 'rounded',
-                sign_text = true,
-                set_lsp_keymaps = { preserve_mappings = false }
             })
 
-            local lspconfig = require("lspconfig")
+            -- LspAttach autocmd for keymaps
+            vim.api.nvim_create_autocmd('LspAttach', {
+                callback = function(ev)
+                    local client = vim.lsp.get_client_by_id(ev.data.client_id)
+                    local bufnr = ev.buf
+                    local opts = { buffer = bufnr, remap = false }
 
-            lspconfig.nushell.setup({
-                command = { "nu", "--lsp" },
+                    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+                    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+                    vim.keymap.set("n", "<leader>vws", vim.lsp.buf.workspace_symbol, opts)
+                    vim.keymap.set("n", "<leader>vd", vim.diagnostic.open_float, opts)
+                    vim.keymap.set("n", "[d", function() vim.diagnostic.jump({ count = -1, float = true }) end, opts)
+                    vim.keymap.set("n", "]d", function() vim.diagnostic.jump({ count = 1, float = true }) end, opts)
+                    vim.keymap.set("n", "<leader>vca", vim.lsp.buf.code_action, opts)
+                    vim.keymap.set("n", "<leader>a", vim.lsp.buf.code_action, opts)
+                    vim.keymap.set("n", "<leader>vrr", vim.lsp.buf.references, opts)
+                    vim.keymap.set("n", "<leader>vrn", vim.lsp.buf.rename, opts)
+                    vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, opts)
+
+                    -- Disable semantic tokens
+                    if client then
+                        client.server_capabilities.semanticTokensProvider = nil
+                    end
+                end,
+            })
+
+            -- Server-specific configs
+            vim.lsp.config('nushell', {
+                cmd = { "nu", "--lsp" },
                 filetypes = { "nu" },
-                root_dir = require("lspconfig.util").find_git_ancestor,
                 single_file_support = true,
             })
 
+            vim.lsp.config('lua_ls', {
+                settings = {
+                    Lua = {
+                        runtime = { version = 'LuaJIT' },
+                        workspace = {
+                            checkThirdParty = false,
+                            library = vim.api.nvim_get_runtime_file("", true),
+                        },
+                        telemetry = { enable = false },
+                    },
+                },
+            })
+
+            vim.lsp.config('nil_ls', {
+                settings = {
+                    ['nil'] = {
+                        formatting = {
+                            command = { "nixpkgs-fmt" }
+                        }
+                    }
+                },
+            })
+
+            vim.lsp.config('yamlls', {
+                settings = {
+                    yaml = {
+                        format = { enable = true },
+                    },
+                },
+            })
+
+            -- Diagnostic config
             vim.diagnostic.config({
                 virtual_text = true,
                 signs = true,
@@ -143,48 +170,18 @@ return {
                 float = true,
             })
 
+            -- Mason-lspconfig setup
             require('mason-lspconfig').setup({
                 ensure_installed = { 'lua_ls', 'gopls', 'terraformls' },
                 handlers = {
                     function(server_name)
-                        lspconfig[server_name].setup({})
+                        vim.lsp.enable(server_name)
                     end,
-
-                    gopls = lsp.noop,
-                    rust_analyzer = lsp.noop,
-
-                    yamlls = function()
-                        require('lspconfig').yamlls.setup({
-                            settings = {
-                                yaml = {
-                                    format = {
-                                        enable = true,
-                                    }
-                                },
-                            },
-                        })
-                    end,
-
-                    lua_ls = function()
-                        lspconfig.lua_ls.setup({
-                            on_init = function(client)
-                                lsp.nvim_lua_settings(client, {})
-                            end
-                        })
-                    end,
-                    nil_ls = function()
-                        local nil_ls_opts = {
-                            settings = {}
-                        }
-                        nil_ls_opts.settings['nil'] = {
-                            formatting = {
-                                command = { "nixpkgs-fmt" }
-                            }
-                        }
-                        lspconfig.nil_ls.setup(nil_ls_opts)
-                    end,
-                }
+                },
             })
+
+            -- Enable nushell manually (not managed by mason)
+            vim.lsp.enable('nushell')
         end
     }
 }

@@ -237,45 +237,26 @@
   environment.systemPackages = with pkgs; [
     nautilus-open-any-terminal
     gedit
-    gnome.gnome-remote-desktop
-    gnomeExtensions.remmina-search-provider
+    gnome-remote-desktop
     gnomeExtensions.dash-to-dock
-    gnomeExtensions.appindicator #For App Indicators in Gnome
-    gnomeExtensions.pop-shell # Tiling windows manager
-    gnome.gnome-software
+    gnomeExtensions.appindicator
+    gnome-software
     gnome-extension-manager
     gnomeExtensions.gsconnect
-    gnomeExtensions.gnordvpn-local
-    gnome.gnome-tweaks
+    gnome-tweaks
     gnome-podcasts
     gnomeExtensions.just-perfection
     gnomeExtensions.arcmenu
-    gnomeExtensions.browser-tabs
-    cinnamon.nemo-with-extensions
-    gnomeExtensions.custom-reboot # Reboot into another OS directly from GNOME.
-    gnomeExtensions.blur-my-shell # Adds a blur look to different parts of the GNOME Shell, including the top panel, dash and overview.
-    gnomeExtensions.gnome-clipboard # A gnome shell extension to manage your clipboard.
-    gnomeExtensions.removable-drive-menu # A status menu for accessing and unmounting removable devices.
-    gnomeExtensions.status-area-horizontal-spacing # Reduce the horizontal spacing between icons in the top-right status area
-    gnome.dconf-editor
-    gnomeExtensions.unite # Unite is a GNOME Shell extension which makes a few layout tweaks to the top panel and removes window decorations to make it look like Ubuntu Unity Shell
-    gnomeExtensions.forge # Tiling and window manager for GNOME
-    gnomeExtensions.tactile # Tile windows on a custom grid using your keyboard. Type Super-T to show the grid, then type two tiles (or the same tile twice) to move the active window.
-    gnomeExtensions.gsnap # Organize windows in customizable snap zones like FancyZones on Windows.
-    gnomeExtensions.paperwm # Tiling window manager with a twist!
-    gnomeExtensions.weather # Animation Weather. 
-    gnomeExtensions.miniview # Displays a mini window preview (like picture-in-picture on a TV):
-    gnomeExtensions.rebootto # gnomeExtensions.rebootto
-    gnomeExtensions.reboottouefi # Reboot system into UEFI
-    gnomeExtensions.shortcuts # This shows a pop-up of useful keyboard shortcuts when Ctrl + Alt + Super + S is pressed (hotkey can be changed in settings)
-    gnomeExtensions.ip-finder # Displays useful information about your public IP Address and VPN status.
-    gnomeExtensions.files-menu # Quickly navigate your file system and open files through a menu.
-    gnomeExtensions.freon # Shows CPU temperature, disk temperature, video card temperature (NVIDIA/Catalyst/Bumblebee&NVIDIA), voltage and fan RPM (forked from xtranophilist/gnome-shell-extension-sensors)
-    gnomeExtensions.vitals # A glimpse into your computer's temperature, voltage, fan speed, memory usage, processor load, system resources, network speed and storage stats. This is a one stop shop to monitor all of your vital sensors. Uses asynchronous polling to provide a smooth user experience. Feature requests or bugs? Please use GitHub.
-    gnomeExtensions.tophat # TopHat aims to be an elegant system resource monitor for the GNOME shell. It displays CPU, memory, disk, and network activity in the GNOME top bar.
+    nemo-with-extensions
+    gnomeExtensions.blur-my-shell
+    dconf-editor
+    gnomeExtensions.forge
+    gnomeExtensions.paperwm
+    gnomeExtensions.freon
+    gnomeExtensions.vitals
   ];
 
   # Get Gnome Settings Daemon running for gnome-shell extensions.
-  services.udev.packages = with pkgs; [ gnome.gnome-settings-daemon ];
+  services.udev.packages = with pkgs; [ gnome-settings-daemon ];
 
 }

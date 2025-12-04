@@ -125,7 +125,8 @@
             };
 
             nightman = mkSystem "nightman" {};
-            
+
+            testvm = mkSystem "testvm" {};
         };
     };
 }

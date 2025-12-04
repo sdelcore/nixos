@@ -11,7 +11,7 @@
         #    };
 
             op-secrets = {
-                source = "$HOME/.config/op";
+                source = "/home/sdelcore/.config/op";
                 target = "/mnt/op-host";
             };
         };
