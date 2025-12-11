@@ -29,7 +29,7 @@ in
   environment.variables = {
     #WLR_NO_HARDWARE_CURSORS = "1";
     NIXOS_OZONE_WL = "1";
-    EDITOR = "nano";
+    EDITOR = "nvim";
     BROWSER = "zen";
     TERMINAL = "alacritty";
   };

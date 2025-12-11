@@ -1,6 +1,8 @@
 { config, pkgs, ... }:
 
 {
+  nixpkgs.config.cudaSupport = true;
+
   # Graphics Card
 
   # Enable OpenGL

@@ -18,6 +18,7 @@
     ../modules/neovim.nix
     ../modules/opencode/default.nix
     ../modules/scripts.nix
+    ../modules/sttd.nix
     ../modules/ulauncher.nix
     ../modules/zsh.nix
     ../modules/zellij.nix

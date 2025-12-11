@@ -31,6 +31,10 @@
             url = "github:youwen5/zen-browser-flake";
             inputs.nixpkgs.follows = "nixpkgs";
         };
+        sttd = {
+            url = "github:sdelcore/sttd";
+            inputs.nixpkgs.follows = "nixpkgs";
+        };
     };
 
     outputs = inputs@{
@@ -43,7 +47,8 @@
         opnix,
         catppuccin,
         nixvirt,
-        zen-browser
+        zen-browser,
+        sttd
     }:
     let 
         system = "x86_64-linux";
