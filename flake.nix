@@ -60,6 +60,9 @@
             nixvirt.nixosModules.default
         ];
 
+        # Primary user for all systems
+        primaryUser = "sdelcore";
+
         # Unstable overlay configuration
         unstableOverlay = {
             nixpkgs.overlays = [
@@ -74,17 +77,14 @@
 
         # Home manager configuration factory
         mkHomeManagerConfig = homeFile: extraSpecialArgs: {
-            home-manager.users.sdelcore = import homeFile;
+            home-manager.users.${primaryUser} = import homeFile;
             home-manager.sharedModules = [
                 nur.modules.homeManager.default
                 catppuccin.homeModules.catppuccin
             ];
             home-manager.backupFileExtension = "backup";
-            home-manager.extraSpecialArgs = extraSpecialArgs;
+            home-manager.extraSpecialArgs = { inherit primaryUser; } // extraSpecialArgs;
         };
-
-        # Primary user for all systems
-        primaryUser = "sdelcore";
 
         # System configuration factory
         mkSystem = hostname: { extraModules ? [], homeFile ? null, extraHomeSpecialArgs ? {} }:

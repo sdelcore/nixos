@@ -1,46 +1,26 @@
-{ inputs, lib, config, pkgs, ... }: 
+{ inputs, lib, config, pkgs, ... }:
 {
-  # Install Node.js to enable npm
   home.packages = with pkgs; [
-    nodejs_22
-    # Dependencies for hooks
     yq
     ripgrep
+    gnutar
+    gzip
   ];
 
-  # Add npm global bin to PATH for user-installed packages
-  home.sessionPath = [ 
-    "$HOME/.npm-global/bin" 
+  home.sessionPath = [
+    "$HOME/.opencode/bin"
   ];
-  
-  # Set npm prefix to user directory
-  home.sessionVariables = {
-    NPM_CONFIG_PREFIX = "$HOME/.npm-global";
-  };
 
-  # Create and manage ~/.opencode directory
   home.file.".config/opencode/opencode.jsonc".source = ./opencode.jsonc;
-  
-  # Copy hook scripts with executable permissions
-  #home.file.".claude/hooks/common-helpers.sh" = {
-  #  source = ./hooks/common-helpers.sh;
-  #  executable = true;
-  #};
 
-  # Create necessary directories
-  #home.file.".claude/.keep".text = "";
-  
-  # Install Claude Code on activation
+  # Install OpenCode via native installer
   home.activation.installopencode = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    PATH="${pkgs.nodejs_22}/bin:$PATH"
-    export NPM_CONFIG_PREFIX="$HOME/.npm-global"
-    
-    if ! command -v opencode >/dev/null 2>&1; then
-      echo "Installing opencode..."
-      npm i -g opencode-ai@latest 
+    export PATH="${pkgs.curl}/bin:${pkgs.wget}/bin:${pkgs.gnutar}/bin:${pkgs.gzip}/bin:$PATH"
+    if [ ! -f "$HOME/.opencode/bin/opencode" ]; then
+      echo "Installing OpenCode..."
+      ${pkgs.curl}/bin/curl -fsSL https://opencode.ai/install | ${pkgs.bash}/bin/bash
     else
-      echo "opencode is already installed at $(which opencode)"
+      echo "OpenCode is already installed at $HOME/.opencode/bin/opencode"
     fi
   '';
-
 }

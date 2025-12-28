@@ -1,6 +1,6 @@
-{ inputs, lib, config, pkgs, system, ... }:
+{ inputs, lib, config, pkgs, ... }:
 let
-  sttd = inputs.sttd.packages.${system}.default;
+  sttd = inputs.sttd.packages.${pkgs.system}.default;
 in
 {
   home.packages = [
@@ -10,11 +10,10 @@ in
   ];
 
   # sttd daemon systemd user service
+  # Started explicitly by Hyprland via exec-once = systemctl --user start sttd
   systemd.user.services.sttd = {
     Unit = {
       Description = "Speech-to-Text Daemon";
-      PartOf = [ "graphical-session.target" ];
-      After = [ "graphical-session.target" ];
     };
 
     Service = {
@@ -23,27 +22,33 @@ in
       Restart = "on-failure";
       RestartSec = 5;
     };
-
-    Install.WantedBy = [ "graphical-session.target" ];
   };
 
   # Default configuration
   xdg.configFile."sttd/config.toml".text = ''
     [transcription]
-    model = "base"
-    device = "auto"
-    compute_type = "auto"
+    model = "base"           # tiny, base, small, medium, large-v3
+    device = "auto"          # auto, cuda, cpu
+    compute_type = "auto"    # auto, float16, int8, float32
     language = "en"
-    streaming = true         # Continuous streaming transcription
-    chunk_duration = 2.0     # Seconds per chunk
 
     [audio]
     sample_rate = 16000
     channels = 1
-    device = "default"
-    beep_enabled = true
+    device = "default"       # or specific device name
+    beep_enabled = true      # audio feedback on start/stop
 
-    [output]
-    method = "wtype"
+    [diarization]
+    device = "auto"          # auto, cuda, cpu
+    similarity_threshold = 0.5  # Profile matching threshold (0-1)
+    min_segment_duration = 0.5  # Minimum segment length for embedding (seconds)
+
+    [server]
+    host = "127.0.0.1"       # 0.0.0.0 to accept remote connections
+    port = 8765
+
+    [client]
+    server_url = "http://127.0.0.1:8765"
+    timeout = 60.0           # Request timeout in seconds
   '';
 }

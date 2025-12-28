@@ -54,6 +54,10 @@
     };
 
     initContent = ''
+      # source home-manager session variables (unset guard to force re-source)
+      unset __HM_SESS_VARS_SOURCED
+      . "$HOME/.nix-profile/etc/profile.d/hm-session-vars.sh"
+
       # kubectl auto-complete
       source <(kubectl completion zsh)
 
