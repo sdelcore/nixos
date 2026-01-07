@@ -9,37 +9,19 @@ in
     pkgs.wl-clipboard # For clipboard fallback
   ];
 
-  # sttd daemon systemd user service (desktop mode with tray icon)
+  # sttd daemon with embedded HTTP server
+  # Provides both desktop mode (tray icon, hotkey toggle) and HTTP API
   # Started explicitly by Hyprland via exec-once = systemctl --user start sttd
+  # HTTP API used by mem and other services that need transcription
   systemd.user.services.sttd = {
     Unit = {
-      Description = "Speech-to-Text Daemon (Desktop)";
-    };
-
-    Service = {
-      Type = "simple";
-      ExecStart = "${sttd}/bin/sttd start";
-      Restart = "on-failure";
-      RestartSec = 5;
-    };
-  };
-
-  # sttd HTTP server systemd user service (headless mode for remote transcription)
-  # Enable with: systemctl --user enable --now sttd-server
-  # Used by mem and other services that need transcription via HTTP API
-  systemd.user.services.sttd-server = {
-    Unit = {
-      Description = "Speech-to-Text HTTP Server";
+      Description = "Speech-to-Text Daemon";
       After = [ "network.target" ];
     };
 
-    Install = {
-      WantedBy = [ "default.target" ];
-    };
-
     Service = {
       Type = "simple";
-      ExecStart = "${sttd}/bin/sttd server --host 0.0.0.0";
+      ExecStart = "${sttd}/bin/sttd start --http";
       Restart = "on-failure";
       RestartSec = 5;
       # Environment variables for GPU support
@@ -69,11 +51,7 @@ in
     min_segment_duration = 0.5  # Minimum segment length for embedding (seconds)
 
     [server]
-    host = "0.0.0.0"         # Accept remote connections
+    host = "0.0.0.0"         # Accept remote connections (used by --http flag)
     port = 8765
-
-    [client]
-    server_url = "http://127.0.0.1:8765"
-    timeout = 60.0           # Request timeout in seconds
   '';
 }

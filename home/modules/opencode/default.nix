@@ -11,6 +11,17 @@
     "$HOME/.opencode/bin"
   ];
 
+  home.sessionVariables = {
+    OPENCODE_ENABLE_EXA = "true";
+  };
+
+  # Load EXA_API_KEY from opnix secret for interactive sessions
+  home.sessionVariablesExtra = ''
+    if [ -r /var/lib/opnix/secrets/exaApiKey ]; then
+      export EXA_API_KEY=$(cat /var/lib/opnix/secrets/exaApiKey)
+    fi
+  '';
+
   home.file.".config/opencode/opencode.jsonc".source = ./opencode.jsonc;
 
   # Install OpenCode via native installer
@@ -23,4 +34,29 @@
       echo "OpenCode is already installed at $HOME/.opencode/bin/opencode"
     fi
   '';
+
+  # OpenCode server with mDNS enabled for Android discovery
+  # Starts automatically on boot, can be controlled with:
+  #   systemctl --user start/stop/restart opencode-server
+  systemd.user.services.opencode-server = {
+    Unit = {
+      Description = "OpenCode Server with mDNS";
+      After = [ "network.target" ];
+    };
+
+    Service = {
+      Type = "simple";
+      # Load EXA_API_KEY from opnix secret and start server
+      ExecStart = "${pkgs.bash}/bin/bash -c 'if [ -r /var/lib/opnix/secrets/exaApiKey ]; then export EXA_API_KEY=$(cat /var/lib/opnix/secrets/exaApiKey); fi; exec %h/.opencode/bin/opencode serve'";
+      Restart = "on-failure";
+      RestartSec = 5;
+      # Set working directory for session context
+      WorkingDirectory = "%h";
+      Environment = [ "OPENCODE_ENABLE_EXA=true" ];
+    };
+
+    Install = {
+      WantedBy = [ "default.target" ];
+    };
+  };
 }

@@ -3,5 +3,9 @@
   // Theme configuration
   //"theme": "opencode",
   //"model": "anthropic/claude-sonnet-4-20250514",
-  "autoupdate": true
+  "autoupdate": true,
+  // Server configuration - enable mDNS for discovery
+  "server": {
+    "mdns": true
+  }
 }

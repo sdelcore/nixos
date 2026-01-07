@@ -9,6 +9,7 @@
       ports = [ "11434:11434" ];
       extraOptions = [ 
         "--device=nvidia.com/gpu=all"
+        "--pull=always"
       ];
       volumes = [ "/home/sdelcore/.ollama:/root/.ollama" ];
       environment = {

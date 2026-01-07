@@ -9,6 +9,80 @@ let
     nightman = "rsa";
   };
   hostKeyType = hostKeyTypes.${hostName} or "ed25519";
+
+  # Script to convert PKCS#8 ed25519 keys to OpenSSH format
+  # (1Password SDK returns PKCS#8, but OpenSSH needs its native format)
+  pkcs8ToOpenssh = pkgs.writeScript "pkcs8-to-openssh" ''
+    #!${pkgs.python3}/bin/python3
+    import sys
+    import base64
+    import struct
+
+    def convert(input_path, output_path):
+        with open(input_path, "r") as f:
+            pem = f.read()
+
+        # Check if already OpenSSH format
+        if "BEGIN OPENSSH PRIVATE KEY" in pem:
+            with open(output_path, "w") as f:
+                f.write(pem)
+            return
+
+        # Parse PKCS#8 PEM
+        lines = pem.strip().split("\n")
+        b64 = "".join(lines[1:-1])
+        der = base64.b64decode(b64)
+
+        # Extract ed25519 private seed (32 bytes at offset 16) and public key (32 bytes at offset 51)
+        private_seed = der[16:48]
+        public_key = der[51:83]
+
+        def encode_string(s):
+            if isinstance(s, str):
+                s = s.encode()
+            return struct.pack(">I", len(s)) + s
+
+        key_type = b"ssh-ed25519"
+        pubkey_blob = encode_string(key_type) + encode_string(public_key)
+
+        checkint = struct.pack(">I", 0x12345678)
+        private_blob = (
+            checkint + checkint +
+            encode_string(key_type) +
+            encode_string(public_key) +
+            encode_string(private_seed + public_key) +
+            encode_string(b"")
+        )
+
+        # Padding with 1, 2, 3... sequence
+        pad_len = 8 - (len(private_blob) % 8)
+        if pad_len == 8:
+            pad_len = 0
+        for i in range(1, pad_len + 1):
+            private_blob += bytes([i])
+
+        openssh_key = (
+            b"openssh-key-v1\x00" +
+            encode_string(b"none") +
+            encode_string(b"none") +
+            encode_string(b"") +
+            struct.pack(">I", 1) +
+            encode_string(pubkey_blob) +
+            encode_string(private_blob)
+        )
+
+        b64_key = base64.b64encode(openssh_key).decode()
+        key_lines = [b64_key[i:i+70] for i in range(0, len(b64_key), 70)]
+
+        with open(output_path, "w") as f:
+            f.write("-----BEGIN OPENSSH PRIVATE KEY-----\n")
+            for line in key_lines:
+                f.write(line + "\n")
+            f.write("-----END OPENSSH PRIVATE KEY-----\n")
+
+    if __name__ == "__main__":
+        convert(sys.argv[1], sys.argv[2])
+  '';
 in
 {
   services.onepassword-secrets = {
@@ -39,6 +113,12 @@ in
     secrets."${hostName}HostKeyPublic" = {
       reference = "op://Infrastructure/${hostName}/public key";
       mode = "0444";
+    };
+
+    # Exa API key for OpenCode web search
+    secrets."exaApiKey" = {
+      reference = "op://Infrastructure/exa/credential";
+      mode = "0444";  # User-readable for opencode
     };
   };
 
@@ -78,7 +158,9 @@ in
 
       if [ -f "$PRIV" ] && [ -f "$PUB" ]; then
         mkdir -p "$SSH_DIR"
-        cp "$PRIV" "$SSH_DIR/id_rsa"
+
+        # Convert PKCS#8 to OpenSSH format (1Password SDK returns PKCS#8 for ed25519)
+        ${pkcs8ToOpenssh} "$PRIV" "$SSH_DIR/id_rsa"
         cp "$PUB" "$SSH_DIR/id_rsa.pub"
         chmod 600 "$SSH_DIR/id_rsa"
         chmod 644 "$SSH_DIR/id_rsa.pub"
