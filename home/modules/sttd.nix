@@ -24,9 +24,11 @@ in
       ExecStart = "${sttd}/bin/sttd start --http";
       Restart = "on-failure";
       RestartSec = 5;
-      # Environment variables for GPU support
+      # Environment variables for GPU support and Wayland clipboard
       Environment = [
         "CUDA_VISIBLE_DEVICES=0"
+        "WAYLAND_DISPLAY=wayland-1"
+        "XDG_RUNTIME_DIR=/run/user/1000"
       ];
     };
   };
@@ -44,6 +46,10 @@ in
     channels = 1
     device = "default"       # or specific device name
     beep_enabled = true      # audio feedback on start/stop
+
+    [vad]
+    enabled = false          # Disabled - VAD incorrectly filters out longer recordings
+    threshold = 0.3          # Speech probability threshold (lower = more permissive)
 
     [diarization]
     device = "auto"          # auto, cuda, cpu
