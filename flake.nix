@@ -31,8 +31,8 @@
             url = "github:youwen5/zen-browser-flake";
             inputs.nixpkgs.follows = "nixpkgs";
         };
-        sttd = {
-            url = "github:sdelcore/sttd";
+        voiced = {
+            url = "github:sdelcore/voiced";
             inputs.nixpkgs.follows = "nixpkgs";
         };
     };
@@ -48,7 +48,7 @@
         catppuccin,
         nixvirt,
         zen-browser,
-        sttd
+        voiced
     }:
     let 
         system = "x86_64-linux";

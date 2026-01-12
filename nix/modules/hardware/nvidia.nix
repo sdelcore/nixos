@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   nixpkgs.config.cudaSupport = true;
@@ -15,6 +15,12 @@
   environment.variables.VDPAU_DRIVER = "va_gl";
   environment.variables.LIBVA_DRIVER_NAME = "nvidia";
   environment.variables.MUTTER_DEBUG_KMS_THREAD_TYPE="user";
+
+  # Make CUDA libraries available to user applications (PyTorch, etc.)
+  # This prepends the NVIDIA driver libs to LD_LIBRARY_PATH for all sessions
+  environment.extraInit = ''
+    export LD_LIBRARY_PATH="/run/opengl-driver/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+  '';
 
   # Load nvidia driver for Xorg and Wayland
   services.xserver.videoDrivers = ["nvidia"];

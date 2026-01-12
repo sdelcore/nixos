@@ -1,7 +1,7 @@
 {...}: {
   programs.zellij = {
     enable = true;
-    enableZshIntegration = true;
+    enableZshIntegration = false; # Custom integration in zsh.nix with guards
     settings = {
         theme = "catppuccin-macchiato";
     };

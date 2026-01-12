@@ -69,6 +69,17 @@
       autoload -z edit-command-line
       zle -N edit-command-line
       bindkey "^e" edit-command-line
+
+      # Zellij auto-attach with guards to prevent spawning sessions from
+      # non-interactive shells (e.g., OpenCode command execution)
+      # Guards:
+      #   - $ZELLIJ: not already inside Zellij
+      #   - $- == *i*: shell is interactive
+      #   - $TERM: terminal is set and not "dumb"
+      #   - $INSIDE_EMACS/$VSCODE_INJECTION: not in IDE terminals
+      if [[ -z "$ZELLIJ" && $- == *i* && -n "$TERM" && "$TERM" != "dumb" && -z "$INSIDE_EMACS" && -z "$VSCODE_INJECTION" ]]; then
+        eval "$(zellij setup --generate-auto-start zsh)"
+      fi
     '';
   };
 
