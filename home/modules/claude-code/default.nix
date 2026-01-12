@@ -22,7 +22,7 @@
     export PATH="${pkgs.curl}/bin:${pkgs.wget}/bin:$PATH"
     if [ ! -f "$HOME/.local/bin/claude" ]; then
       echo "Installing Claude Code..."
-      ${pkgs.curl}/bin/curl -fsSL https://claude.ai/install.sh | ${pkgs.bash}/bin/bash -s -- --force
+      ${pkgs.curl}/bin/curl -fsSL https://claude.ai/install.sh | ${pkgs.bash}/bin/bash -s -- stable
     else
       echo "Claude Code is already installed at $HOME/.local/bin/claude"
     fi
