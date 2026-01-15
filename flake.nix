@@ -26,7 +26,10 @@
         # ricing
         catppuccin.url = "github:catppuccin/nix/3ba714046ee32373e88166e6e9474d6ae6a5b734";
         # applications
-        nur.url = "github:nix-community/NUR";
+        nur = {
+            url = "github:nix-community/NUR";
+            inputs.nixpkgs.follows = "nixpkgs";
+        };
         zen-browser = {
             url = "github:youwen5/zen-browser-flake";
             inputs.nixpkgs.follows = "nixpkgs";
