@@ -5,7 +5,7 @@
       {
         "float": [
           {
-            "class": "ulauncher"
+            "class": "Rofi"
           },
           {
             "class": "gnome-calculator"

@@ -8,7 +8,7 @@ in {
     ./../swappy.nix
     ./../swaync.nix
     ./../waybar.nix
-    ./../wofi.nix
+    ./../rofi.nix
     ./../xdg.nix
     ./../gtk.nix
   ];

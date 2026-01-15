@@ -19,7 +19,7 @@
     ../modules/opencode/default.nix
     ../modules/scripts.nix
     ../modules/voiced.nix
-    ../modules/ulauncher.nix
+    ../modules/rofi.nix
     ../modules/zsh.nix
     ../modules/zellij.nix
     ../modules/zen-browser.nix

@@ -178,8 +178,8 @@ in
 
       "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0" = {
         "binding" = "<Control>space";
-        "command" = "ulauncher-toggle";
-        "name" = "Ulauncher";
+        "command" = "rofi -show drun";
+        "name" = "Rofi";
       };
 
       "org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1" = {
