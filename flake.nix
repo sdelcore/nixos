@@ -24,7 +24,10 @@
             inputs.nixpkgs.follows = "nixpkgs";
         };
         # ricing
-        catppuccin.url = "github:catppuccin/nix/3ba714046ee32373e88166e6e9474d6ae6a5b734";
+        catppuccin = {
+            url = "github:catppuccin/nix/3ba714046ee32373e88166e6e9474d6ae6a5b734";
+            inputs.nixpkgs.follows = "nixpkgs";
+        };
         # applications
         nur = {
             url = "github:nix-community/NUR";
