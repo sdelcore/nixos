@@ -7,7 +7,10 @@
   security.pam.u2f = {
     enable = true;
     control = "sufficient";  # YubiKey OR password
-    settings.cue = true;  # Print "Please touch the device" message
+    settings = {
+      cue = true;  # Print "Please touch the device" message
+      authfile = "/var/lib/opnix/secrets/yubikeyU2fKeys";
+    };
   };
 
   # Enable YubiKey for login, sudo, and hyprlock

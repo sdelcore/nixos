@@ -185,29 +185,6 @@ in
     '';
   };
 
-  # Deploy YubiKey U2F keys to user config
-  systemd.services.opnix-deploy-yubikey = {
-    description = "Deploy YubiKey U2F keys from opnix";
-    after = [ "opnix-secrets.service" ];
-    wants = [ "opnix-secrets.service" ];
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-    };
-    script = ''
-      U2F_KEYS="/var/lib/opnix/secrets/yubikeyU2fKeys"
-      YUBICO_DIR="/home/${primaryUser}/.config/Yubico"
-
-      if [ -f "$U2F_KEYS" ]; then
-        mkdir -p "$YUBICO_DIR"
-        cp "$U2F_KEYS" "$YUBICO_DIR/u2f_keys"
-        chmod 600 "$YUBICO_DIR/u2f_keys"
-        chown -R ${primaryUser}:users "$YUBICO_DIR"
-      fi
-    '';
-  };
-
   # Deploy host SSH keys to /etc/ssh/
   systemd.services.opnix-deploy-host-ssh-keys = {
     description = "Deploy host SSH keys from opnix";
