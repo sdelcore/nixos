@@ -1,15 +1,7 @@
 { config, pkgs, ... }:
 
 {
-  # Until I have own dotfiles setup to recreate
-  # nix-shell -p pam_u2f
-  # mkdir -p ~/.config/Yubico
-  # pamu2fcfg > ~/.config/Yubico/u2f_keys
-  
-  # Add my Yubikey to ~/.config/Yubico/u2f_keys
-  home-manager.users.sdelcore = {
-    #home.file.".config/Yubico/u2f_keys".source = /home/nexxius/Dotfiles/.config/Yubico/u2f_keys;
-  }; # End of Home Manager
+  # YubiKey U2F keys deployed via opnix (see opnix.nix)
   
   # U2F authentication settings
   security.pam.u2f = {

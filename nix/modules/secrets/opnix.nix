@@ -120,6 +120,12 @@ in
       reference = "op://Infrastructure/exa/credential";
       mode = "0444";  # User-readable for opencode
     };
+
+    # YubiKey U2F public key
+    secrets."yubikeyU2fKeys" = {
+      reference = "op://Infrastructure/yubikey/u2f_keys";
+      mode = "0400";
+    };
   };
 
   # Set user password after opnix fetches the hash
@@ -175,6 +181,29 @@ in
         chmod 600 "$AUTH_KEYS"
 
         chown -R ${primaryUser}:users "$SSH_DIR"
+      fi
+    '';
+  };
+
+  # Deploy YubiKey U2F keys to user config
+  systemd.services.opnix-deploy-yubikey = {
+    description = "Deploy YubiKey U2F keys from opnix";
+    after = [ "opnix-secrets.service" ];
+    wants = [ "opnix-secrets.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      U2F_KEYS="/var/lib/opnix/secrets/yubikeyU2fKeys"
+      YUBICO_DIR="/home/${primaryUser}/.config/Yubico"
+
+      if [ -f "$U2F_KEYS" ]; then
+        mkdir -p "$YUBICO_DIR"
+        cp "$U2F_KEYS" "$YUBICO_DIR/u2f_keys"
+        chmod 600 "$YUBICO_DIR/u2f_keys"
+        chown -R ${primaryUser}:users "$YUBICO_DIR"
       fi
     '';
   };

@@ -10,6 +10,7 @@
   xdg.configFile = {
     "zellij/config.kdl".text = # kdl
       ''
+        default_mode "locked"
         show_startup_tips false
         keybinds {
           unbind "Ctrl q"
