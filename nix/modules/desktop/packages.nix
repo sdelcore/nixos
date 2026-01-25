@@ -24,7 +24,10 @@
 
     # Tools
     unstable.vscode.fhs
-    prusa-slicer
+    (pkgs.writeShellScriptBin "prusa-slicer" ''
+      unset __GLX_VENDOR_LIBRARY_NAME
+      exec ${pkgs.prusa-slicer}/bin/prusa-slicer "$@"
+    '')
     cliphist
     flameshot
     normcap

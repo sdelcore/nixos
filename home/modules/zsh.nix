@@ -78,6 +78,9 @@
       #   - $TERM: terminal is set and not "dumb"
       #   - $INSIDE_EMACS/$VSCODE_INJECTION: not in IDE terminals
       if [[ -z "$ZELLIJ" && $- == *i* && -n "$TERM" && "$TERM" != "dumb" && -z "$INSIDE_EMACS" && -z "$VSCODE_INJECTION" ]]; then
+        if [[ -n "$SSH_TTY" ]]; then
+          export ZELLIJ_CONFIG_FILE="$HOME/.config/zellij/config-remote.kdl"
+        fi
         eval "$(zellij setup --generate-auto-start zsh)"
       fi
     '';
