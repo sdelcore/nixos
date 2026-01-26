@@ -21,15 +21,27 @@
     };
     includes = [
       {
-        condition = "gitdir:~/src/";
+        # Default for all git repos
+        condition = "gitdir:~/";
         contents = {
           user = {
-            name = "sdelcore";
+            name = "Spencer Delcore";
             email = "sdelcore@gmail.com";
           };
         };
       }
       {
+        # HMS repos override
+        condition = "gitdir:~/hms/";
+        contents = {
+          user = {
+            name = "Spencer Delcore";
+            email = "spde@hms.se";
+          };
+        };
+      }
+      {
+        # Wiselab repos
         condition = "gitdir:~/wiselab/";
         contents = {
           user = {

@@ -23,6 +23,7 @@
 
     shellAliases = {
       cat = "bat";
+      cc = "claude --dangerously-skip-permissions";
 
       ff = "fastfetch";
 
