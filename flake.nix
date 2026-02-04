@@ -2,11 +2,11 @@
     description = "A simple NixOS flake";
 
     inputs = {
-        nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+        nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
         nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
         # Home-Manager
         home-manager = {
-            url = "github:nix-community/home-manager/release-25.05"; # Stable
+            url = "github:nix-community/home-manager/release-25.11"; # Stable
             inputs.nixpkgs.follows = "nixpkgs";
         };
         # platform
@@ -121,7 +121,7 @@
 
     in {
         # Standalone home-manager configurations for non-NixOS VMs
-        # Usage: nix run home-manager/release-25.05 -- switch --flake .#headless
+        # Usage: nix run home-manager/release-25.11 -- switch --flake .#headless
         homeConfigurations = {
             # Default config using "sdelcore" username
             "sdelcore" = mkHomeConfig "sdelcore";

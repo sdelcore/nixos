@@ -80,7 +80,7 @@ in
     w3m
     unstable.appimage-run
     jose
-    thefuck
+    pay-respects
     tree
 
 
@@ -94,7 +94,6 @@ in
     # shells
     zsh
     oh-my-zsh # A framework for managing your zsh configuration
-    zsh-history # A CLI to provide enhanced history for your ZSH shell
     zsh-completions
     zsh-powerlevel9k
     zsh-powerlevel10k
@@ -132,7 +131,7 @@ in
     (python3.withPackages (ps: with ps; [pip virtualenv]))
     delta
     dig
-    du-dust
+    dust
     eza
     fd
     gcc
@@ -183,7 +182,7 @@ in
 
   programs.nix-ld = {
       enable = true;
-      package = pkgs.nix-ld-rs; # only for NixOS 24.05
+      package = pkgs.nix-ld;
   };
 
   # Garbage Collection

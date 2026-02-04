@@ -15,7 +15,7 @@ in
     enableOnBoot = true; 
     listenOptions = [ "/run/docker.sock" "0.0.0.0:2376" ];
     extraOptions = "--insecure-registry registry.sdelcore.com";
-    package = pkgs.docker_27;
+    package = pkgs.docker_28;
     rootless.daemon.settings.features.cdi = true;
     daemon.settings.features.cdi = true;
   };

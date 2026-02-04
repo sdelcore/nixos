@@ -36,6 +36,7 @@
       ggp = "git push";
 
       htop = "btop";
+      nix-gc = "find ~/src -name .direnv -type d -mtime +30 -exec rm -rf {} + ; sudo nix-collect-garbage -d";
       top = "btop";
 
       ld = "lazydocker";

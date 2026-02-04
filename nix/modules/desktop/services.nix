@@ -8,8 +8,9 @@
     xkb.layout = "us";
     xkb.variant = "";
     excludePackages = with pkgs; [ xterm ];
-    displayManager.gdm.enable = true;
   };
+
+  services.displayManager.gdm.enable = true;
 
   nixpkgs.config.firefox.enableDrmSupport = true;
 }

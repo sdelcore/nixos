@@ -1,10 +1,11 @@
 { pkgs, ... }:
 {
+  catppuccin.rofi.enable = true;
+
   programs.rofi = {
     enable = true;
-    package = pkgs.rofi-wayland;
+    package = pkgs.rofi;
     plugins = [ pkgs.rofi-emoji ];
-    catppuccin.enable = true;
     terminal = "${pkgs.alacritty}/bin/alacritty";
     extraConfig = {
       modi = "drun,emoji,run";

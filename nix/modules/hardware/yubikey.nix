@@ -44,7 +44,6 @@
     yubikey-manager # Command line tool for configuring any YubiKey over all USB transports
     yubikey-touch-detector # A tool to detect when your YubiKey is waiting for a touch (to send notification or display a visual indicator on the screen).
     yubikey-personalization # A library and command line tool to personalize YubiKeys
-    yubikey-personalization-gui # A QT based cross-platform utility designed to facilitate reconfiguration of the Yubikey
   ];
 
   services.udev.packages = [ pkgs.yubikey-personalization ];

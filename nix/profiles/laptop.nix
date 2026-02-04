@@ -1,4 +1,6 @@
 { ... }: {
-  services.logind.lidSwitchExternalPower = "ignore";
-  services.logind.lidSwitchDocked = "ignore";
+  services.logind.settings.Login = {
+    HandleLidSwitchExternalPower = "ignore";
+    HandleLidSwitchDocked = "ignore";
+  };
 }

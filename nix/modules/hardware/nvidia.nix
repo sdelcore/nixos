@@ -38,13 +38,14 @@
   hardware.nvidia-container-toolkit.enable = true;
 
   environment.systemPackages = with pkgs; [
-    cudaPackages_12_4.cudatoolkit
+    cudaPackages_12.cudatoolkit
     egl-wayland
   ];
 
   boot.blacklistedKernelModules = [ "nouveau"];
   boot.kernelParams = [ "nouveau.modeset=0" ];
 
-  # Nvidia container support is now handled by hardware.nvidia-container-toolkit.enable above
+  # Enable CDI (Container Device Interface) for Docker GPU support
+  virtualisation.docker.daemon.settings.features.cdi = true;
 
 }

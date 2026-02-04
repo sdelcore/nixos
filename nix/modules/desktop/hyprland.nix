@@ -25,6 +25,7 @@
 
   # Enable security services
   services.gnome.gnome-keyring.enable = true;
+  services.gnome.gcr-ssh-agent.enable = false;
   security.polkit.enable = true;
   # Note: hyprlock PAM is configured in yubikey.nix with U2F support
   security.pam.services.gdm.enableGnomeKeyring = true;
@@ -102,7 +103,6 @@
     wf-recorder
     wlr-randr
     wlsunset
-    kdePackages.xwaylandvideobridge
     mlocate
   ];
 }

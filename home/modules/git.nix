@@ -1,21 +1,22 @@
 {userConfig, ...}: {
   # Install git via home-manager module
-  catppuccin.delta.enable = true;
+  catppuccin.delta.enable = false;
   
+  programs.delta = {
+    enable = true;
+    options = {
+      keep-plus-minus-markers = true;
+      light = false;
+      line-numbers = true;
+      navigate = true;
+      width = 280;
+    };
+  };
+
   programs.git = {
     enable = true;
     lfs.enable = true;
-    delta = {
-      enable = true;
-      options = {
-        keep-plus-minus-markers = true;
-        light = false;
-        line-numbers = true;
-        navigate = true;
-        width = 280;
-      };
-    };
-    extraConfig = {
+    settings = {
       pull.rebase = "true";
       url."ssh://git@github.com/".insteadOf = "https://github.com/";
     };
