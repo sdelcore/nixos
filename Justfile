@@ -39,9 +39,9 @@ testvm-build name="":
 testvm-headless name="" port="2222":
     ./scripts/test-vm.sh --headless --ssh-port {{port}} {{name}}
 
-deploy name="" ip="":
-    nixos-rebuild boot --flake .#{{name}} --use-remote-sudo --target-host {{ip}}
-    ssh {{ip}} sudo reboot now
+deploy name="" ip="" mode="switch":
+    nixos-rebuild {{mode}} --flake .#{{name}} --use-remote-sudo --target-host {{ip}}
+    {{ if mode == "boot" { "ssh " + ip + " sudo reboot now" } else { "" } }}
 
 # Provision with opnix token (1Password service account) to a new machine
 provision name="" ip="":

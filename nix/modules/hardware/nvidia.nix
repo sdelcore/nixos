@@ -2,6 +2,7 @@
 
 {
   nixpkgs.config.cudaSupport = true;
+  nixpkgs.config.nvidia.acceptLicense = true;
 
   # Graphics Card
 
@@ -29,9 +30,11 @@
     modesetting.enable = true;
     powerManagement.enable = true;
     powerManagement.finegrained = false;
-    open = true;
-    nvidiaSettings = true;
-    package = config.boot.kernelPackages.nvidiaPackages.production;
+    open = false;
+    nvidiaSettings = false;
+    # production (580.x) has a bug with DP MST through Thunderbolt docks:
+    # https://github.com/NVIDIA/open-gpu-kernel-modules/issues/879
+    package = config.boot.kernelPackages.nvidiaPackages.dc;
     forceFullCompositionPipeline = true;
   };
   
