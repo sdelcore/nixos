@@ -139,7 +139,9 @@
 
             testvm = mkSystem "testvm" {};
 
-            lab = mkSystem "lab" {};
+            lab = mkSystem "lab" {
+                extraModules = [ disko.nixosModules.disko ];
+            };
         };
     };
 }
