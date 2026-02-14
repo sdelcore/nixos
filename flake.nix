@@ -138,6 +138,8 @@
             nightman = mkSystem "nightman" {};
 
             testvm = mkSystem "testvm" {};
+
+            lab = mkSystem "lab" {};
         };
     };
 }
