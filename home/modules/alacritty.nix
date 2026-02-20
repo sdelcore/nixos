@@ -6,11 +6,7 @@
     enable = true;
     settings = {
       terminal.shell.program = "zsh";
-      terminal.shell.args = [
-        "-l"
-        "-c"
-        "zellij attach --create workspace"
-      ];
+      terminal.shell.args = ["-l"];
 
       env = {
         TERM = "xterm-256color";

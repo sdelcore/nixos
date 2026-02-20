@@ -41,6 +41,9 @@
             url = "github:sdelcore/voiced";
             inputs.nixpkgs.follows = "nixpkgs";
         };
+        zjstatus = {
+            url = "github:dj95/zjstatus";
+        };
     };
 
     outputs = inputs@{
@@ -54,7 +57,8 @@
         catppuccin,
         nixvirt,
         zen-browser,
-        voiced
+        voiced,
+        zjstatus
     }:
     let 
         system = "x86_64-linux";
@@ -89,7 +93,10 @@
                 catppuccin.homeModules.catppuccin
             ];
             home-manager.backupFileExtension = "backup";
-            home-manager.extraSpecialArgs = { inherit primaryUser; } // extraSpecialArgs;
+            home-manager.extraSpecialArgs = {
+                inherit primaryUser;
+                zjstatus = zjstatus.packages.${system}.default;
+            } // extraSpecialArgs;
         };
 
         # System configuration factory
@@ -112,7 +119,10 @@
                 inherit system;
                 config.allowUnfree = true;
             };
-            extraSpecialArgs = { inherit username; };
+            extraSpecialArgs = {
+                inherit username;
+                zjstatus = zjstatus.packages.${system}.default;
+            };
             modules = [
                 catppuccin.homeModules.catppuccin
                 ./home/headless.nix

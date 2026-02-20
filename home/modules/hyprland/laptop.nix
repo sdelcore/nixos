@@ -3,8 +3,8 @@
 
   hyprland = {
     configSource = ./../../configs/hypr/laptop;
-    wallpaper = ./../../wallpapers/lines.png;
-    wallpaperLock = ./../../wallpapers/lines.png;
+    wallpaper = ./../../wallpapers/wallhaven-j3qq15.jpg;
+    wallpaperLock = ./../../wallpapers/wallhaven-j3qq15.jpg;
     enableSuspend = true;
   };
 }

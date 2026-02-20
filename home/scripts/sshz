@@ -5,4 +5,4 @@ if [ ! "$#" -gt 0 ]; then
   exit 1
 fi
 
-ssh -t "$1" "ZELLIJ_SKIP=1 zsh -ic 'zellij attach -c remote'"
+ssh -t "$1" "zsh -lc 'zellij attach -c remote'"

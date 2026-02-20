@@ -49,6 +49,8 @@
       vi = "nvim";
       vim = "nvim";
 
+      z = "zellij attach -c workspace";
+
       ls = "eza --icons always"; # default view
       ll = "eza -bhl --icons --group-directories-first"; # long list
       la = "eza -abhl --icons --group-directories-first"; # all list
@@ -72,20 +74,6 @@
       zle -N edit-command-line
       bindkey "^e" edit-command-line
 
-      # Zellij auto-attach with guards to prevent spawning sessions from
-      # non-interactive shells (e.g., OpenCode command execution)
-      # Guards:
-      #   - $ZELLIJ: not already inside Zellij
-      #   - $ZELLIJ_SKIP: sshz sets this to bypass auto-start and control session name
-      #   - $- == *i*: shell is interactive
-      #   - $TERM: terminal is set and not "dumb"
-      #   - $INSIDE_EMACS/$VSCODE_INJECTION: not in IDE terminals
-      if [[ -z "$ZELLIJ" && -z "$ZELLIJ_SKIP" && $- == *i* && -n "$TERM" && "$TERM" != "dumb" && -z "$INSIDE_EMACS" && -z "$VSCODE_INJECTION" ]]; then
-        if [[ -n "$SSH_TTY" ]]; then
-          export ZELLIJ_CONFIG_FILE="$HOME/.config/zellij/config-remote.kdl"
-        fi
-        eval "$(zellij setup --generate-auto-start zsh)"
-      fi
     '';
   };
 

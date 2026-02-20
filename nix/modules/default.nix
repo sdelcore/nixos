@@ -34,9 +34,6 @@ in
     TERMINAL = "alacritty";
   };
 
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
-
   # Enable sound with pipewire.
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
@@ -55,17 +52,6 @@ in
     #media-session.enable = true;
   };
 
-  # NixPackages Configuration
-  # Insecure Packages
-  # Needed to allow building with insecure packages.
-  nixpkgs.config.permittedInsecurePackages = [
-    "electron-12.2.3"
-    "electron-19.1.9"
-    "electron-24.8.6"
-    "electron-25.9.0"
-    "electron-29.4.6"
-  ];
-
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
 
@@ -75,25 +61,13 @@ in
     wget
     curl
     fzf
-    sshpass
     jq
-    w3m
-    unstable.appimage-run
-    jose
-    pay-respects
     tree
-
-
-    ntfs3g # FUSE-based NTFS driver with full write support
-    exfatprogs
-    exfat
     xdg-utils
-    neofetch
-    kubectl
 
     # shells
     zsh
-    oh-my-zsh # A framework for managing your zsh configuration
+    oh-my-zsh
     zsh-completions
     zsh-powerlevel9k
     zsh-powerlevel10k
@@ -106,48 +80,23 @@ in
     git
     btop
     bat
-    samba
-    tree
     unzip
-    xrdp
     file
-    distrobox
-    parallel
-    tree
-    jq
-    
-    # libs
-    libuuid
-    libossp_uuid
-    libusb1
-    libusbp
-    pkgs.home-manager
+    home-manager
 
     # misc
     coreutils
     pciutils
-    ffmpeg
-
-    (python3.withPackages (ps: with ps; [pip virtualenv]))
     delta
     dig
     dust
     eza
     fd
-    gcc
-    glib
-    glibc
-    gnumake
     jq
     killall
     nh
     dysk
     just
-    
-    vagrant
-    packer
-    opentofu
-    ansible
   ];
 
   programs.zsh.enable = true;
@@ -155,12 +104,6 @@ in
   # List services that you want to enable:
   
   services = {
-    syncthing = {
-        enable = true;
-        user = "sdelcore";
-        dataDir = "/home/sdelcore/sync";    # Default folder for new synced folders
-        configDir = "/home/sdelcore/.config/syncthing";   # Folder for Syncthing's settings and keys
-    };
     openssh = {
         enable = true;
         settings = {

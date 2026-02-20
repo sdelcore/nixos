@@ -3,8 +3,7 @@
     ./hardware/lab.nix
     ./disks/sda.nix
     ./profiles/base.nix
-    ./modules/desktop/default.nix
-    ./modules/desktop/hyprland.nix
+    ./modules/desktop/lab.nix
   ];
 
   networking.hostName = "lab";
