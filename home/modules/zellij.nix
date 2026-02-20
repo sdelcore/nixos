@@ -2,13 +2,11 @@
   programs.zellij = {
     enable = true;
     enableZshIntegration = false;
-    settings = {
-        theme = "catppuccin-macchiato";
-    };
   };
 
   # Local config (Ctrl+g)
   xdg.configFile."zellij/config.kdl".text = ''
+    theme "catppuccin-macchiato"
     default_mode "normal"
     default_layout "default"
     show_startup_tips false

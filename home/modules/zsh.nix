@@ -49,7 +49,7 @@
       vi = "nvim";
       vim = "nvim";
 
-      z = "zellij attach -c workspace";
+      z = "zellij --layout default attach -c workspace";
 
       ls = "eza --icons always"; # default view
       ll = "eza -bhl --icons --group-directories-first"; # long list
