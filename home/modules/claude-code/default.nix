@@ -17,6 +17,12 @@
   home.file.".claude/statsig/.keep".text = "";
   home.file.".claude/commands/.keep".text = "";
 
+  # Obsidian vault plugin
+  home.file.".claude/plugins/obsidian" = {
+    source = ./plugins/obsidian;
+    recursive = true;
+  };
+
   # Install Claude Code via native installer
   home.activation.installClaudeCode = lib.hm.dag.entryAfter ["writeBoundary"] ''
     export PATH="${pkgs.curl}/bin:${pkgs.wget}/bin:$PATH"
