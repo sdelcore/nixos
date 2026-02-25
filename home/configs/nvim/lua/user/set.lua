@@ -33,6 +33,7 @@ vim.opt.colorcolumn = "100"
 
 vim.g.mapleader = " "
 
+vim.opt.clipboard = "unnamedplus"
 vim.opt.autowrite = true
 vim.opt.autowriteall = true
 vim.opt.autoindent = true
