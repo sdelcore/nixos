@@ -12,7 +12,7 @@
 
       # Disables ligatures
       #font-feature = ["-liga" "-dlig" "-calt"];
-      theme = "catppuccin-mocha";
+      theme = "Catppuccin Mocha";
 
       # Tiling WM (Hyprland) - no decorations needed
       gtk-titlebar = false;

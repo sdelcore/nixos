@@ -15,12 +15,31 @@
 
     # Communication
     teams-for-linux
-    (pkgs.writeShellScriptBin "teams-work" ''
-      exec ${pkgs.teams-for-linux}/bin/teams-for-linux \
-        --class=teams-work \
-        --user-data-dir="$HOME/.config/teams-profile-work" \
-        "$@"
-    '')
+    (let
+      teams-work-script = pkgs.writeShellScriptBin "teams-work" ''
+        exec ${pkgs.teams-for-linux}/bin/teams-for-linux \
+          --class=teams-work \
+          --user-data-dir="$HOME/.config/teams-profile-work" \
+          "$@"
+      '';
+    in pkgs.symlinkJoin {
+      name = "teams-work";
+      paths = [ teams-work-script ];
+      postBuild = ''
+        mkdir -p $out/share/applications
+        cat > $out/share/applications/teams-work.desktop <<EOF
+        [Desktop Entry]
+        Name=Teams (Work)
+        Comment=Microsoft Teams - Work Profile
+        Exec=${teams-work-script}/bin/teams-work
+        Icon=teams-for-linux
+        Terminal=false
+        Type=Application
+        Categories=Network;InstantMessaging;
+        StartupWMClass=teams-work
+        EOF
+      '';
+    })
     unstable.signal-desktop
     unstable.vesktop
 
