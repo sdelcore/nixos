@@ -9,7 +9,7 @@
 }
 
 window#waybar {
-  background: rgba(0, 0, 0, 0);
+  background: rgba(0, 0, 0, 0.6);
 }
 
 window#waybar.hidden {
@@ -30,11 +30,10 @@ tooltip label {
 .modules-right,
 .modules-center,
 .modules-left {
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: transparent;
   border: none;
   border-radius: 0;
-  margin-left: 8px;
-  margin-right: 8px;
+  margin: 0;
 }
 
 #workspaces button {
