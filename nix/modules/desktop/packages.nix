@@ -56,6 +56,7 @@
     cliphist
     flameshot
     normcap
+    remmina
     unstable.logiops
     gnome-disk-utility
 

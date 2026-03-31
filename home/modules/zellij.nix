@@ -38,7 +38,7 @@
 
         pane size=1 borderless=true {
             plugin location="file://${zjstatus}/bin/zjstatus.wasm" {
-                hide_frame_for_single_pane "true"
+                hide_frame_for_single_pane "false"
 
                 format_left  "{mode}#[fg=#89B4FA,bg=#181825,bold] {session}#[bg=#181825] {tabs}"
                 format_right "{datetime}"
