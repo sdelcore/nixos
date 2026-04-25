@@ -10,13 +10,16 @@ let
   # Agent Skills standard (https://agentskills.io/specification).
   skillDirs = lib.filterAttrs (_: type: type == "directory") (readDirSafe skillsDir);
 
-  # Symlink each SKILL.md into both default discovery roots:
-  #   ~/.claude/skills/<name>/SKILL.md  — read by Claude Code
-  #   ~/.agents/skills/<name>/SKILL.md  — read natively by opencode and pi
-  # Single-file home.file entries leave each skill's parent directory writable,
-  # so users can drop additional skill dirs locally without conflict.
-  mkSkillEntry = base: name: lib.nameValuePair "${base}/${name}/SKILL.md" {
-    source = skillsDir + "/${name}/SKILL.md";
+  # Symlink each skill directory into both default discovery roots:
+  #   ~/.claude/skills/<name>/   — read by Claude Code
+  #   ~/.agents/skills/<name>/   — read natively by opencode and pi
+  # Recursive directory entries pull in SKILL.md plus any bundled reference
+  # docs (LANGUAGE.md, tests.md, etc.) the skill links to. The skills/ parent
+  # directory itself stays writable, so users can drop additional skill dirs
+  # locally without conflict.
+  mkSkillEntry = base: name: lib.nameValuePair "${base}/${name}" {
+    source = skillsDir + "/${name}";
+    recursive = true;
   };
 
   claudeEntries = lib.mapAttrs' (name: _: mkSkillEntry ".claude/skills" name) skillDirs;
