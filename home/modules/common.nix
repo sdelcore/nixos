@@ -5,6 +5,7 @@
     ../modules/ssh.nix
     ../modules/bat.nix
     ../modules/bottom.nix
+    ../modules/agent-skills/default.nix
     ../modules/claude-code/default.nix
     ../modules/direnv.nix
     ../modules/fzf.nix

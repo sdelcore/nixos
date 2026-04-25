@@ -1,21 +1,13 @@
 { inputs, lib, config, pkgs, ... }:
 
 let
-  skillsDir = ./skills;
   commandsDir = ./commands;
 
   readDirSafe = path:
     if builtins.pathExists path then builtins.readDir path else { };
 
-  # Auto-discover skills: each subdirectory of ./skills must contain SKILL.md
-  skillDirs = lib.filterAttrs (_: type: type == "directory")
-    (readDirSafe skillsDir);
-
-  skillEntries = lib.mapAttrs'
-    (name: _: lib.nameValuePair ".claude/skills/${name}/SKILL.md" {
-      source = skillsDir + "/${name}/SKILL.md";
-    })
-    skillDirs;
+  # Skills are managed by the shared agent-skills module so they're picked up
+  # by Claude, opencode, and pi from a single source.
 
   # Auto-discover commands: every *.md file in ./commands
   commandFileNames = lib.filterAttrs
@@ -67,7 +59,7 @@ in
       source = ./plugins/obsidian;
       recursive = true;
     };
-  } // skillEntries // commandEntries;
+  } // commandEntries;
 
   # Deep-merge base settings into ~/.claude/settings.json on every activation.
   # Preserves user-added keys (effortLevel, enabledPlugins, etc.) and any
