@@ -12,6 +12,7 @@
     ../modules/lazygit.nix
     ../modules/neovim.nix
     ../modules/opencode/default.nix
+    ../modules/pi/default.nix
     ../modules/scripts.nix
     ../modules/rofi.nix
     ../modules/zsh.nix

@@ -7,5 +7,8 @@
         ./modules/extended.nix
         ./modules/hyprland/laptop.nix
         ./modules/1password.nix
+        ./modules/sagent.nix
     ];
+
+    services.sagent.enable = true;
 }

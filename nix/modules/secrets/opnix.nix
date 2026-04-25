@@ -121,6 +121,12 @@ in
       mode = "0444";  # User-readable for opencode
     };
 
+    # OpenCode Zen API key for pi coding agent
+    secrets."opencodeApiKey" = {
+      reference = "op://Infrastructure/OpenCode/credential";
+      mode = "0444";  # User-readable for pi
+    };
+
     # YubiKey U2F public key
     secrets."yubikeyU2fKeys" = {
       reference = "op://Infrastructure/yubikey/u2f_keys";

@@ -41,6 +41,10 @@
             url = "github:sdelcore/voiced";
             inputs.nixpkgs.follows = "nixpkgs";
         };
+        sagent = {
+            url = "github:sdelcore/sagent";
+            inputs.nixpkgs.follows = "nixpkgs";
+        };
         zjstatus = {
             url = "github:dj95/zjstatus";
         };
@@ -58,6 +62,7 @@
         nixvirt,
         zen-browser,
         voiced,
+        sagent,
         zjstatus
     }:
     let 
