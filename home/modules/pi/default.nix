@@ -1,4 +1,33 @@
 { inputs, lib, config, pkgs, ... }:
+
+let
+  extensionsDir = ./extensions;
+
+  readDirSafe = path:
+    if builtins.pathExists path then builtins.readDir path else { };
+
+  # Pi auto-discovers two extension shapes from ~/.pi/agent/extensions/:
+  #   <name>.ts                  (single-file extension)
+  #   <name>/index.ts            (directory extension)
+  # We mirror that here. Single-file home.file entries only manage the
+  # specific symlink, so locally-added files in ~/.pi/agent/extensions/
+  # are left untouched across activations.
+  isExtensionEntry = name: type:
+    (type == "regular" && lib.hasSuffix ".ts" name) || (type == "directory");
+
+  extensions = lib.filterAttrs isExtensionEntry (readDirSafe extensionsDir);
+
+  mkExtensionFile = name: type:
+    let src = extensionsDir + "/${name}";
+    in if type == "directory"
+       then { source = src; recursive = true; }
+       else { source = src; };
+
+  extensionEntries = lib.mapAttrs'
+    (name: type: lib.nameValuePair ".pi/agent/extensions/${name}"
+      (mkExtensionFile name type))
+    extensions;
+in
 {
   home.packages = with pkgs; [
     nodejs_22
@@ -15,6 +44,8 @@
       export OPENCODE_API_KEY=$(cat /var/lib/opnix/secrets/opencodeApiKey)
     fi
   '';
+
+  home.file = extensionEntries;
 
   # Install pi coding agent globally under ~/.npm-global so npm doesn't try to
   # write into the nix store. Skips if already installed.
