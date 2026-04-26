@@ -1,12 +1,14 @@
 ---
-description: Create a new Claude Code skill in the upstream nixos config
+description: Create a new shared agent skill in the upstream nixos config
 allowed-tools: Bash, Read
 ---
 
-Create a new Claude Code skill in the upstream NixOS config at
+Create a new agent skill in the upstream NixOS config at
 `sdelcore@nightman.tap:~/src/infra/nixos`. Skills added here are
-auto-discovered by `home/modules/claude-code/default.nix` and
-propagate to every host on its next `just switch`.
+auto-discovered by `home/modules/agent-skills/default.nix` and
+symlinked into both `~/.claude/skills/<name>/` (Claude Code) and
+`~/.agents/skills/<name>/` (opencode, pi) on every host's next
+`just switch`.
 
 ## Arguments
 
@@ -38,14 +40,14 @@ If anything is missing, ask before proceeding.
 ### 3. Check for conflict
 
 Before writing, verify
-`home/modules/claude-code/skills/<name>/` does not already exist:
+`home/modules/agent-skills/skills/<name>/` does not already exist:
 
 ```bash
 # local
-test -d home/modules/claude-code/skills/<name> && echo exists
+test -d home/modules/agent-skills/skills/<name> && echo exists
 
 # remote
-ssh sdelcore@nightman.tap "test -d ~/src/infra/nixos/home/modules/claude-code/skills/<name> && echo exists"
+ssh sdelcore@nightman.tap "test -d ~/src/infra/nixos/home/modules/agent-skills/skills/<name> && echo exists"
 ```
 
 If it exists, abort and ask the user whether to overwrite. Require
@@ -68,16 +70,16 @@ allowed-tools: <tools>
 **Local write**:
 
 ```bash
-mkdir -p home/modules/claude-code/skills/<name>
-# then use the Write tool to create home/modules/claude-code/skills/<name>/SKILL.md
+mkdir -p home/modules/agent-skills/skills/<name>
+# then use the Write tool to create home/modules/agent-skills/skills/<name>/SKILL.md
 ```
 
 **Remote write** (one SSH call, heredoc):
 
 ```bash
 ssh sdelcore@nightman.tap bash <<REMOTE
-  mkdir -p ~/src/infra/nixos/home/modules/claude-code/skills/<name>
-  cat > ~/src/infra/nixos/home/modules/claude-code/skills/<name>/SKILL.md <<'SKILL_EOF'
+  mkdir -p ~/src/infra/nixos/home/modules/agent-skills/skills/<name>
+  cat > ~/src/infra/nixos/home/modules/agent-skills/skills/<name>/SKILL.md <<'SKILL_EOF'
 <content>
 SKILL_EOF
 REMOTE
@@ -89,10 +91,10 @@ Nix flakes only see git-tracked files:
 
 ```bash
 # local
-git add home/modules/claude-code/skills/<name>/SKILL.md
+git add home/modules/agent-skills/skills/<name>/SKILL.md
 
 # remote
-ssh sdelcore@nightman.tap "cd ~/src/infra/nixos && git add home/modules/claude-code/skills/<name>/SKILL.md"
+ssh sdelcore@nightman.tap "cd ~/src/infra/nixos && git add home/modules/agent-skills/skills/<name>/SKILL.md"
 ```
 
 ### 6. Report back
@@ -100,6 +102,7 @@ ssh sdelcore@nightman.tap "cd ~/src/infra/nixos && git add home/modules/claude-c
 Tell the user:
 
 - The path of the new skill
+- That it auto-flows to Claude Code, opencode, and pi
 - To run `just switch` on each host where they want it active
 - To review + commit + push when they're happy
 - That the skill auto-activates next session (no manual wiring
@@ -111,3 +114,5 @@ Tell the user:
 - Do NOT run `just switch` automatically
 - Do NOT overwrite an existing skill without explicit confirmation
 - Do NOT edit `default.nix` — skills are auto-discovered
+- Bundled reference docs (e.g. `LANGUAGE.md`) sit alongside SKILL.md
+  in the same skill dir; the module mounts the whole directory
