@@ -10,7 +10,7 @@
 ## 🚀 Features
 
 ### System Architecture
-- **NixOS 25.05** with Flakes
+- **NixOS 25.11** with Flakes
 - **Disko** for declarative disk partitioning
 - **Home Manager** for user environments
 
@@ -26,6 +26,11 @@
 - **Tools**: Git, Direnv, FZF, Ripgrep, Bat
 - **Containers**: Docker, Libvirt/QEMU
 - **Terminal**: Zsh + Starship, Zellij/Tmux
+
+### Agent Tooling
+- **Claude Code**, **opencode**, **pi** managed via Home Manager modules
+- Shared skills under `home/modules/agent-skills/skills/` symlink into `~/.claude/skills/` and `~/.agents/skills/` so all three agents see the same `SKILL.md` set
+- Pi extensions auto-discovered from `home/modules/pi/extensions/`; locally-dropped extensions in `~/.pi/agent/extensions/` survive activations
 
 ### Security & Auth
 - **1Password** integration
@@ -58,19 +63,25 @@ just deploy host ip  # Remote deployment
 
 ```
 .
-├── flake.nix           # Entry point, defines hosts
+├── flake.nix                # Entry point, defines hosts via mkSystem
 ├── nix/
-│   ├── modules/        # System modules
-│   │   ├── common/     # Shared configs (boot, network, performance)
-│   │   ├── desktop/    # DE configurations
-│   │   ├── hardware/   # Hardware-specific
-│   │   ├── software/   # Application modules
-│   │   └── virtualization/
-│   ├── hardware/       # Per-host hardware configs
-│   └── users/          # User definitions
+│   ├── <host>.configuration.nix   # Per-host system config
+│   ├── modules/             # System modules (common, desktop, hardware, software, virtualization)
+│   ├── disks/               # Disko layouts
+│   ├── hardware/            # Per-host hardware configs
+│   ├── profiles/            # Reusable system profiles
+│   └── users/               # User definitions
 └── home/
-    ├── modules/        # Home Manager modules
-    └── configs/        # Application dotfiles
+    ├── <host>.nix           # Per-host Home Manager config
+    ├── modules/             # Home Manager modules (shell, editors, desktop apps)
+    │   ├── agent-skills/    # Shared SKILL.md set for Claude/opencode/pi
+    │   ├── claude-code/     # Claude Code commands, plugins, settings
+    │   ├── opencode/
+    │   ├── pi/              # pi coding agent + auto-discovered extensions
+    │   └── hyprland/
+    ├── configs/             # Application dotfiles
+    ├── scripts/
+    └── wallpapers/
 ```
 
 ---
