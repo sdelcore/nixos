@@ -17,6 +17,8 @@ let
     ''}
     exec ${cfg.package}/bin/sagent watch-all \
       --model ${lib.escapeShellArg cfg.model} \
+      --max-per-hour ${toString cfg.maxPerHour} \
+      --rate-limit-cooldown ${toString cfg.rateLimitCooldown} \
       ${lib.escapeShellArgs cfg.extraArgs}
   '';
 in
@@ -57,6 +59,28 @@ in
         ANTHROPIC_API_KEY and sagent bills that key per-token. When null,
         the Agent SDK uses the user's Claude Code subscription auth — no
         key needed.
+      '';
+    };
+
+    maxPerHour = lib.mkOption {
+      type = lib.types.int;
+      default = 0;
+      example = 20;
+      description = ''
+        Cap on LLM calls per rolling hour. 0 disables the cap. Counts every
+        per-session digest AND every project rollup as one call. nightman
+        and dayman share one Claude subscription quota, so the sum across
+        hosts shouldn't exceed your tier's 5-hour window.
+      '';
+    };
+
+    rateLimitCooldown = lib.mkOption {
+      type = lib.types.int;
+      default = 1800;
+      description = ''
+        Seconds to sleep after the API returns a rate-limit error before
+        resuming digests. The watcher won't mark the throttled session as
+        done, so it'll retry on the next pass.
       '';
     };
 

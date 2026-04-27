@@ -10,5 +10,10 @@
         ./modules/sagent.nix
     ];
 
-    services.sagent.enable = true;
+    services.sagent = {
+        enable = true;
+        # 7 LLM calls/hour ≈ 3-4 sessions/hour (each session = per-session
+        # digest + project rollup = 2 calls).
+        maxPerHour = 7;
+    };
 }

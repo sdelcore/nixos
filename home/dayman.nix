@@ -10,5 +10,10 @@
         ./modules/sagent.nix
     ];
 
-    services.sagent.enable = true;
+    services.sagent = {
+        enable = true;
+        # Shared subscription quota with nightman.
+        # 7/hr each ≈ 3-4 sessions/hour ≈ 70 LLM calls/5h combined.
+        maxPerHour = 7;
+    };
 }
