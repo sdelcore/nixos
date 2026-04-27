@@ -5,6 +5,7 @@
     ../modules/ghostty.nix
     ../modules/go.nix
     ../modules/lazydocker.nix
+    ../modules/lmstudio.nix
     ../modules/voiced.nix
   ];
 }
