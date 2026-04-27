@@ -24,6 +24,11 @@
 
   home.file.".config/opencode/opencode.jsonc".source = ./opencode.jsonc;
 
+  # Share the global agent instructions with Claude Code by sourcing the
+  # same CLAUDE.md file. opencode reads ~/.config/opencode/AGENTS.md as
+  # global instructions on every session.
+  home.file.".config/opencode/AGENTS.md".source = ../claude-code/CLAUDE.md;
+
   # Install OpenCode via native installer
   home.activation.installopencode = lib.hm.dag.entryAfter ["writeBoundary"] ''
     export PATH="${pkgs.curl}/bin:${pkgs.wget}/bin:${pkgs.gnutar}/bin:${pkgs.gzip}/bin:$PATH"

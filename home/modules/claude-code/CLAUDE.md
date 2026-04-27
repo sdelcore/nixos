@@ -48,6 +48,31 @@ switch. Applying a foreign host config will break the system.
 - Do not push unless I explicitly ask
 - Stage specific files, not `git add .`
 
+## Project Workflow & Pull Requests
+
+The rules below apply to **software project repositories** —
+not personal infra repos (the upstream nixos config at
+`~/src/infra/nixos`, the homelab repo at `~/src/infra/homelab`,
+or anything under `~/hms/`) where direct commits to main
+are fine.
+
+- Do not commit directly to main. Create a feature branch,
+  push it, and open a PR for review
+- Branch names: short, kebab-case, descriptive of the change
+  (e.g. `fix-stale-token-refresh`, `add-search-pagination`)
+- Open the PR with a title and a body explaining the *why*,
+  then share the URL so I can review
+- After opening, monitor the PR's CI pipeline. If any check
+  fails, investigate the root cause and push a fix to the
+  branch — never re-run blindly or paper over a real failure
+- Watch the PR for review comments. When feedback lands,
+  address it in a follow-up commit on the branch. If I push
+  back on a suggestion, argue the point or take the change —
+  do not silently ignore
+- When the PR is merged, return to main and `git pull` before
+  starting follow-up work, so the next branch starts from
+  current state
+
 ## Code Quality
 
 - Match the existing style and patterns of the codebase
