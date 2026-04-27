@@ -50,11 +50,10 @@ switch. Applying a foreign host config will break the system.
 
 ## Project Workflow & Pull Requests
 
-The rules below apply to **software project repositories** —
-not personal infra repos (the upstream nixos config at
-`~/src/infra/nixos`, the homelab repo at `~/src/infra/homelab`,
-or anything under `~/hms/`) where direct commits to main
-are fine.
+These rules apply to **every repository**, including personal
+infra (`~/src/infra/nixos`, `~/src/infra/homelab`, `~/hms/*`).
+Treat main as protected — go through the PR flow even when
+you're the only reviewer.
 
 - Do not commit directly to main. Create a feature branch,
   push it, and open a PR for review
