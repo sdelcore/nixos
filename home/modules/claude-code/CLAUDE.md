@@ -50,8 +50,7 @@ switch. Applying a foreign host config will break the system.
 
 ## Project Workflow & Pull Requests
 
-These rules apply to **every repository**, including personal
-infra (`~/src/infra/nixos`, `~/src/infra/homelab`, `~/hms/*`).
+These rules apply to **every repository**, with no exceptions.
 Treat main as protected — go through the PR flow even when
 you're the only reviewer.
 
