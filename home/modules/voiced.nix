@@ -36,20 +36,15 @@ in
   # Default configuration
   xdg.configFile."voiced/config.toml".text = ''
     [transcription]
-    model = "base"           # tiny, base, small, medium, large-v3
+    model = "nvidia/parakeet-tdt-0.6b-v3"  # NeMo ASRModel HF id
     device = "auto"          # auto, cuda, cpu
-    compute_type = "auto"    # auto, float16, int8, float32
-    language = "en"
+    language = "en"          # advisory only; Parakeet TDT v3 auto-detects
 
     [audio]
     sample_rate = 16000
     channels = 1
     device = "default"       # or specific device name
     beep_enabled = true      # audio feedback on start/stop
-
-    [vad]
-    enabled = false          # Disabled - VAD incorrectly filters out longer recordings
-    threshold = 0.3          # Speech probability threshold (lower = more permissive)
 
     [tts]
     enabled = true           # Enable TTS (requires VibeVoice)
