@@ -36,15 +36,6 @@ let
   };
   piSettingsJson = builtins.toJSON piSettingsAttrs;
   piSettingsFile = "${config.home.homeDirectory}/.pi/agent/settings.json";
-
-  # Shared MCP config consumed by pi-mcp-adapter. Lives under ~/.config/mcp
-  # so other MCP-aware agents can reuse it. Empty by default; downstream
-  # hosts layer servers via their own activation scripts.
-  mcpConfigAttrs = {
-    mcpServers = { };
-  };
-  mcpConfigJson = builtins.toJSON mcpConfigAttrs;
-  mcpConfigFile = "${config.home.homeDirectory}/.config/mcp/mcp.json";
 in
 {
   home.packages = with pkgs; [
@@ -82,21 +73,6 @@ in
           && mv "${piSettingsFile}.tmp" "${piSettingsFile}"
       else
         echo '${piSettingsJson}' | ${pkgs.jq}/bin/jq . > "${piSettingsFile}"
-      fi
-    '';
-
-  # Deep-merge base MCP config into ~/.config/mcp/mcp.json. Other hosts
-  # (e.g. workbox) can layer host-specific mcpServers on top via their
-  # own activation scripts, the same way claude-code settings are layered.
-  home.activation.mcpConfig =
-    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      mkdir -p "$(dirname "${mcpConfigFile}")"
-      if [ -f "${mcpConfigFile}" ]; then
-        ${pkgs.jq}/bin/jq --argjson new '${mcpConfigJson}' '. * $new' \
-          "${mcpConfigFile}" > "${mcpConfigFile}.tmp" \
-          && mv "${mcpConfigFile}.tmp" "${mcpConfigFile}"
-      else
-        echo '${mcpConfigJson}' | ${pkgs.jq}/bin/jq . > "${mcpConfigFile}"
       fi
     '';
 
