@@ -11,6 +11,7 @@
     ../modules/fzf.nix
     ../modules/git.nix
     ../modules/lazygit.nix
+    ../modules/mcp.nix
     ../modules/neovim.nix
     ../modules/opencode/default.nix
     ../modules/pi/default.nix
