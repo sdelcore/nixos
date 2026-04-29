@@ -27,6 +27,24 @@ let
     (name: type: lib.nameValuePair ".pi/agent/extensions/${name}"
       (mkExtensionFile name type))
     extensions;
+
+  # Base pi settings, deep-merged into ~/.pi/agent/settings.json on every
+  # activation. Preserves user-set keys (defaultProvider, defaultModel, etc.)
+  # while keeping nix as the source of truth for auto-installed pi packages.
+  piSettingsAttrs = {
+    packages = [ "npm:pi-mcp-adapter" ];
+  };
+  piSettingsJson = builtins.toJSON piSettingsAttrs;
+  piSettingsFile = "${config.home.homeDirectory}/.pi/agent/settings.json";
+
+  # Shared MCP config consumed by pi-mcp-adapter. Lives under ~/.config/mcp
+  # so other MCP-aware agents can reuse it. Empty by default; downstream
+  # hosts layer servers via their own activation scripts.
+  mcpConfigAttrs = {
+    mcpServers = { };
+  };
+  mcpConfigJson = builtins.toJSON mcpConfigAttrs;
+  mcpConfigFile = "${config.home.homeDirectory}/.config/mcp/mcp.json";
 in
 {
   home.packages = with pkgs; [
@@ -51,6 +69,36 @@ in
     # globally and concatenates it into the system prompt.
     ".pi/agent/AGENTS.md".source = ../claude-code/CLAUDE.md;
   };
+
+  # Deep-merge base pi settings into ~/.pi/agent/settings.json on every
+  # activation. Preserves user-added keys; nix owns the `packages` array
+  # so pi auto-installs pi-mcp-adapter (and any future declared packages).
+  home.activation.piSettings =
+    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      mkdir -p "$(dirname "${piSettingsFile}")"
+      if [ -f "${piSettingsFile}" ]; then
+        ${pkgs.jq}/bin/jq --argjson new '${piSettingsJson}' '. * $new' \
+          "${piSettingsFile}" > "${piSettingsFile}.tmp" \
+          && mv "${piSettingsFile}.tmp" "${piSettingsFile}"
+      else
+        echo '${piSettingsJson}' | ${pkgs.jq}/bin/jq . > "${piSettingsFile}"
+      fi
+    '';
+
+  # Deep-merge base MCP config into ~/.config/mcp/mcp.json. Other hosts
+  # (e.g. workbox) can layer host-specific mcpServers on top via their
+  # own activation scripts, the same way claude-code settings are layered.
+  home.activation.mcpConfig =
+    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      mkdir -p "$(dirname "${mcpConfigFile}")"
+      if [ -f "${mcpConfigFile}" ]; then
+        ${pkgs.jq}/bin/jq --argjson new '${mcpConfigJson}' '. * $new' \
+          "${mcpConfigFile}" > "${mcpConfigFile}.tmp" \
+          && mv "${mcpConfigFile}.tmp" "${mcpConfigFile}"
+      else
+        echo '${mcpConfigJson}' | ${pkgs.jq}/bin/jq . > "${mcpConfigFile}"
+      fi
+    '';
 
   # Install pi coding agent globally under ~/.npm-global so npm doesn't try to
   # write into the nix store. Skips if already installed.
