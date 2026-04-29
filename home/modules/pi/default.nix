@@ -59,6 +59,14 @@ in
     # sourcing the same CLAUDE.md file. Pi loads ~/.pi/agent/AGENTS.md
     # globally and concatenates it into the system prompt.
     ".pi/agent/AGENTS.md".source = ../claude-code/CLAUDE.md;
+
+    # Pin npm's global prefix to ~/.npm-global so any `npm install -g`
+    # (including pi auto-installing pi-mcp-adapter from settings.json
+    # packages) writes to a user-writable path instead of nix's
+    # read-only store. The activation script for pi sets the same
+    # prefix via env var, but it only applies during activation —
+    # pi itself spawns npm at runtime and needs npmrc to find it.
+    ".npmrc".text = "prefix=${config.home.homeDirectory}/.npm-global\n";
   };
 
   # Deep-merge base pi settings into ~/.pi/agent/settings.json on every
