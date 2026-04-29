@@ -515,11 +515,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1777391220,
-        "narHash": "sha256-y4uMLhHq21+vpona1Sl+HWjmYVdsfz3QMC5pUtRtI2I=",
+        "lastModified": 1777434638,
+        "narHash": "sha256-6OojrPYROwp6o6h2EZxq+5MwIVjTJk58odZc/SDinQc=",
         "owner": "sdelcore",
         "repo": "wagent",
-        "rev": "928e1486b2eb755f42cdbf251d516f3b0b574ef3",
+        "rev": "2e130e67d41d3971c7bbec80c50c51c47000fdee",
         "type": "github"
       },
       "original": {
