@@ -5,6 +5,8 @@
     ./profiles/desktop.nix
     ./profiles/development.nix
     ./modules/desktop/monitors.nix
+    ./modules/software/wagent.nix
+    ./modules/software/droidcode.nix
   ];
 
   networking.hostName = "nightman";

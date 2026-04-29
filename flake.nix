@@ -45,6 +45,14 @@
             url = "github:sdelcore/sagent";
             inputs.nixpkgs.follows = "nixpkgs";
         };
+        wagent = {
+            url = "github:sdelcore/wagent";
+            inputs.nixpkgs.follows = "nixpkgs";
+        };
+        droidcode = {
+            url = "github:sdelcore/droidcode";
+            inputs.nixpkgs.follows = "nixpkgs";
+        };
         zjstatus = {
             url = "github:dj95/zjstatus";
         };
@@ -63,6 +71,8 @@
         zen-browser,
         voiced,
         sagent,
+        wagent,
+        droidcode,
         zjstatus
     }:
     let 
