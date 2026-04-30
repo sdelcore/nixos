@@ -14,21 +14,38 @@ in
     host = "0.0.0.0";
     port = 11434;
 
-    # Keep the existing data directory from the previous Docker setup so
-    # we don't re-pull models. The `ollama` system user owns the files
-    # (chowned by the tmpfiles rule below); user access goes through the
-    # daemon on port 11434, not direct filesystem access.
-    home = "/home/sdelcore/.ollama";
-    models = "/home/sdelcore/.ollama/models";
-
     environmentVariables = {
       OLLAMA_FLASH_ATTENTION = "1";
     };
   };
 
-  # The Docker container wrote files as root via bind mount. Hand them
-  # to the new ollama daemon's user. Idempotent — no-op once correct.
-  systemd.tmpfiles.rules = [
-    "Z /home/sdelcore/.ollama - ollama ollama - -"
-  ];
+  # services.ollama runs with DynamicUser, so its data must live under
+  # /var/lib/ollama (the StateDirectory) — the daemon has no traverse
+  # permission into /home/sdelcore. This oneshot copies the models from
+  # the previous Docker container's bind-mount path the first time it
+  # runs; ollama.service's StateDirectory will chown them on its next
+  # start. Idempotent.
+  systemd.services.ollama-migrate = {
+    description = "Seed /var/lib/ollama from the legacy ~/.ollama dir";
+    before = [ "ollama.service" ];
+    requiredBy = [ "ollama.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = pkgs.writeShellScript "ollama-migrate" ''
+        set -euo pipefail
+        if [ -d /var/lib/ollama/models ] \
+            && [ -n "$(${pkgs.coreutils}/bin/ls -A /var/lib/ollama/models 2>/dev/null)" ]; then
+          echo "models already present, skipping"
+          exit 0
+        fi
+        if [ ! -d /home/sdelcore/.ollama/models ]; then
+          echo "no legacy models found at /home/sdelcore/.ollama/models"
+          exit 0
+        fi
+        ${pkgs.coreutils}/bin/mkdir -p /var/lib/ollama
+        ${pkgs.coreutils}/bin/cp -a /home/sdelcore/.ollama/models /var/lib/ollama/
+      '';
+    };
+  };
 }
