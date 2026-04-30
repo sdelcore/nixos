@@ -11,7 +11,7 @@
     ../hardware/ledger.nix
     ../software/1password.nix
     ../software/flatpak.nix
-    ../software/ollama.nix
+    ../software/localllm
     ../virtualization/docker.nix
   ];
 }

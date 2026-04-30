@@ -42,10 +42,6 @@
       ld = "lazydocker";
       lg = "lazygit";
 
-      # Run the ollama CLI inside the daemon container so the version
-      # always matches the running daemon. See nix/modules/software/ollama.nix.
-      ollama = "docker exec -it ollama ollama";
-
       repo = "cd $HOME/src";
       temp = "cd $HOME/Downloads/temp";
 
