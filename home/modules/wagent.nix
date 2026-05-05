@@ -12,8 +12,10 @@ let
     # (not inside any nix profile), and other system tools live in
     # /run/current-system/sw/bin and /run/wrappers/bin. A systemd
     # user service's default PATH has none of those, so we set it
-    # explicitly here.
-    export PATH="/run/wrappers/bin:/run/current-system/sw/bin:${config.home.homeDirectory}/.nix-profile/bin:${config.home.homeDirectory}/.local/bin:$PATH"
+    # explicitly here. ~/.npm-global/bin is included so the pi
+    # harness (installed via `npm install -g @mariozechner/pi-coding-agent`
+    # by home/modules/pi/default.nix) is reachable too.
+    export PATH="/run/wrappers/bin:/run/current-system/sw/bin:${config.home.homeDirectory}/.nix-profile/bin:${config.home.homeDirectory}/.local/bin:${config.home.homeDirectory}/.npm-global/bin:$PATH"
 
     # State + DB live under XDG_STATE_HOME so they survive
     # home-manager rebuilds and can be backed up.
