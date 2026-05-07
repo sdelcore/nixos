@@ -18,11 +18,14 @@
         maxPerHour = 7;
     };
 
-    # wagent on loopback by default — safe to leave on. Flip `bind` to
-    # the tailscale interface and set `authTokenPath` to expose this
-    # host's wagent to peers (e.g. so ARIA on ariaos can drive it via
-    # `wagent-on nightman`).
+    # wagent bound on the LAN with no auth so the phone can reach it
+    # via mDNS (`http://nightman.local:2468`). Trust assumption: the
+    # home network. To re-tighten, drop `bind` back to the default
+    # loopback or flip to the tailscale interface and set
+    # `authTokenPath` (which lets `requireAuth` stay at its default).
     services.wagent = {
         enable = true;
+        bind = "0.0.0.0";
+        requireAuth = false;
     };
 }

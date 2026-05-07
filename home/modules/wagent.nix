@@ -49,19 +49,20 @@ let
     ''}
 
     ${lib.optionalString (cfg.authTokenPath != null) ''
-      # Bearer-auth token. Required when bind isn't loopback. Refusing
-      # to start on a non-loopback bind without a token in place is
-      # safer than coming up unauthenticated on the network.
+      # Bearer-auth token. Required when bind isn't loopback unless
+      # `requireAuth` is explicitly turned off. Refusing to start on a
+      # non-loopback bind without a token in place is safer than
+      # coming up unauthenticated on the network.
       if [ -f ${cfg.authTokenPath} ]; then
         WAGENT_AUTH_TOKEN=$(${pkgs.coreutils}/bin/cat ${cfg.authTokenPath} | ${pkgs.coreutils}/bin/tr -d '[:space:]')
         export WAGENT_AUTH_TOKEN
-      elif [ "${cfg.bind}" != "127.0.0.1" ]; then
+      elif [ "${cfg.bind}" != "127.0.0.1" ] && [ "${if cfg.requireAuth then "1" else "0"}" = "1" ]; then
         echo "wagent: refusing to start — bind=${cfg.bind} requires WAGENT_AUTH_TOKEN but ${cfg.authTokenPath} is missing" >&2
         exit 1
       fi
     ''}
-    ${lib.optionalString (cfg.authTokenPath == null && cfg.bind != "127.0.0.1") ''
-      echo "wagent: refusing to start — bind=${cfg.bind} requires services.wagent.authTokenPath to be set" >&2
+    ${lib.optionalString (cfg.authTokenPath == null && cfg.bind != "127.0.0.1" && cfg.requireAuth) ''
+      echo "wagent: refusing to start — bind=${cfg.bind} requires services.wagent.authTokenPath to be set (or services.wagent.requireAuth = false to bypass)" >&2
       exit 1
     ''}
 
@@ -131,6 +132,19 @@ in
         the wagent wrapper exports it as `GH_TOKEN` so subagent Bash
         calls (e.g. `gh pr list`) work without an interactive
         `gh auth login` on the host.
+      '';
+    };
+
+    requireAuth = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = ''
+        When true (default), wagent refuses to start with a non-loopback
+        `bind` unless `authTokenPath` is set. Set to false to allow an
+        unauthenticated bind on a network interface — only sensible on
+        a private LAN you trust (e.g. mDNS access from your own phone
+        on a home network). Bypassing auth on anything wider is a
+        footgun.
       '';
     };
 
