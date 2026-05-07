@@ -15,6 +15,20 @@ let
     # explicitly here.
     export PATH="/run/wrappers/bin:/run/current-system/sw/bin:${config.home.homeDirectory}/.nix-profile/bin:${config.home.homeDirectory}/.local/bin:$PATH"
 
+    # The npm-installed `claude` is a dynamically-linked ELF that
+    # resolves /lib64/ld-linux-x86-64.so.2 — on NixOS that path is
+    # the nix-ld stub, which needs NIX_LD + NIX_LD_LIBRARY_PATH to
+    # know which loader to dispatch to. The user shell has these
+    # set by NixOS, but a systemd user service starts with a
+    # minimal env that omits them, so the SDK's spawn-claude exits
+    # immediately ("not found"). Re-export from the canonical
+    # NixOS path when present; no-op on non-NixOS or NixOS without
+    # `programs.nix-ld.enable`.
+    if [ -e /run/current-system/sw/share/nix-ld/lib/ld.so ]; then
+      export NIX_LD=/run/current-system/sw/share/nix-ld/lib/ld.so
+      export NIX_LD_LIBRARY_PATH=/run/current-system/sw/share/nix-ld/lib
+    fi
+
     # State + DB live under XDG_STATE_HOME so they survive
     # home-manager rebuilds and can be backed up.
     STATE_DIR="''${XDG_STATE_HOME:-${config.home.homeDirectory}/.local/state}/wagent"
