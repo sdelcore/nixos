@@ -90,7 +90,10 @@ in
         python311Packages.pip
         python311Packages.virtualenv
 
-        nodejs_22
+        # nodejs_24 (npm 11+); setup.sh requires node >=22.12 AND npm >=11
+        # — nodejs_22 ships npm 10.9, which trips the installer into the
+        # nvm fallback that doesn't survive this FHS.
+        nodejs_24
 
         openssl
         openssl.dev
