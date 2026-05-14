@@ -90,6 +90,9 @@ in
         zlib
         zlib.dev
         libffi
+        # llama.cpp's cmake build needs libcurl headers; upstream's
+        # detector prints the apt name (libcurl4-openssl-dev) and bails.
+        curl.dev
         stdenv.cc.cc.lib
 
         cudaPackages.cudatoolkit
