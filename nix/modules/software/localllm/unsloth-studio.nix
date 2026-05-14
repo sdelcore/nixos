@@ -29,13 +29,23 @@ let
     # ~/.local/bin; surface both so `unsloth studio` resolves.
     export PATH="$state_dir/bin:$HOME/.local/bin:$PATH"
 
+    # The installer's nvm step runs `git clone https://github.com/...`.
+    # Inside this FHS chroot /home is owned by nobody (bwrap UID-remap
+    # quirk), so OpenSSH rejects ~/.ssh/config and any ssh-bound clone
+    # fails. The user's ~/.config/git/config has an insteadOf rule that
+    # rewrites github HTTPS to SSH, so we hide the global gitconfig from
+    # the installer to keep its clones on pure HTTPS.
+    run_installer() {
+      tmp=$(mktemp)
+      trap 'rm -f "$tmp"' EXIT
+      curl -fsSL https://unsloth.ai/install.sh -o "$tmp"
+      GIT_CONFIG_GLOBAL=/dev/null sh "$tmp"
+    }
+
     cmd="''${1:-up}"
     case "$cmd" in
       install)
-        tmp=$(mktemp)
-        trap 'rm -f "$tmp"' EXIT
-        curl -fsSL https://unsloth.ai/install.sh -o "$tmp"
-        sh "$tmp"
+        run_installer
         ;;
       shell)
         exec bash
@@ -43,10 +53,7 @@ let
       up|"")
         if [ ! -d "$state_dir/studio" ]; then
           echo "unsloth studio not installed yet; running upstream installer."
-          tmp=$(mktemp)
-          trap 'rm -f "$tmp"' EXIT
-          curl -fsSL https://unsloth.ai/install.sh -o "$tmp"
-          sh "$tmp"
+          run_installer
         fi
         exec unsloth studio -H 0.0.0.0 -p ${toString port}
         ;;
