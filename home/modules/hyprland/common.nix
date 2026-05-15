@@ -48,7 +48,7 @@ in {
 
     "hypr/hypridle.conf".text = ''
       general {
-        lock_cmd = pidof hyprlock || hyprlock
+        lock_cmd = pidof hyprlock || hyprlock --grace 0
         before_sleep_cmd = loginctl lock-session
         after_sleep_cmd = hyprctl dispatch dpms on
       }
@@ -97,9 +97,7 @@ in {
       }
 
       general {
-          no_fade_in = false
-          grace = 0
-          disable_loading_bar = true
+          hide_cursor = false
       }
 
       input-field {
