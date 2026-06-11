@@ -52,7 +52,7 @@
 
   virtualisation = {
     docker = {
-      package = pkgs.docker_28;
+      package = pkgs.docker_29;
       rootless.daemon.settings.features.cdi = true;
       daemon.settings.features.cdi = true;
     };
