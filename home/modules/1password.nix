@@ -6,7 +6,7 @@
   # but the CLI expects it at ~/.1password/agent.sock
   home.activation.link1PasswordSocket = lib.hm.dag.entryAfter ["writeBoundary"] ''
     run mkdir -p $HOME/.1password
-    if [ -S "$XDG_RUNTIME_DIR/op-daemon.sock" ]; then
+    if [ -S "''${XDG_RUNTIME_DIR:-}/op-daemon.sock" ]; then
       run ln -sf "$XDG_RUNTIME_DIR/op-daemon.sock" "$HOME/.1password/agent.sock"
     fi
   '';
