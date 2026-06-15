@@ -127,6 +127,14 @@ in
       mode = "0444";  # User-readable for pi
     };
 
+    # Unsloth Studio API key for pi's local model provider (nightman only —
+    # the RTX 4090 + Studio live there). Lets pi reach the on-box
+    # OpenAI-compatible endpoint at http://localhost:8888/v1.
+    secrets."unslothApiKey" = lib.mkIf (hostName == "nightman") {
+      reference = "op://Infrastructure/Unsloth Nightman API/credential";
+      mode = "0444";  # User-readable for pi
+    };
+
     # YubiKey U2F public key
     secrets."yubikeyU2fKeys" = {
       reference = "op://Infrastructure/yubikey/u2f_keys";
