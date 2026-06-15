@@ -38,6 +38,10 @@ let
   piSettingsFile = "${config.home.homeDirectory}/.pi/agent/settings.json";
 in
 {
+  imports = [
+    ./local-model.nix
+  ];
+
   home.packages = with pkgs; [
     nodejs_22
   ];
