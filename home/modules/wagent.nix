@@ -2,7 +2,6 @@
 let
   cfg = config.services.wagent;
   wagent = inputs.wagent.packages.${pkgs.system}.default;
-  hostname = config.home.username; # filled below by osConfig if available
 
   wrapper = pkgs.writeShellScript "wagent-wrapper" ''
     set -eu

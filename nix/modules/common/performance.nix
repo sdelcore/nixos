@@ -45,8 +45,4 @@
     # Enable transparent hugepages for better memory performance
     "vm.transparent_hugepages" = "madvise";
   };
-
-  # CPU frequency governor - use powersave for laptops, performance for desktops
-  # This can be overridden in machine-specific configs
-  # powerManagement.cpuFreqGovernor = lib.mkDefault "ondemand";
 }

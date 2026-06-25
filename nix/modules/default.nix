@@ -1,11 +1,7 @@
 { config, pkgs, ... }:
 
-# to update to latest: `nix-channel --update nixos; nixos-rebuild switch`
-
-
-let
-  
-in
+# Base system config shared by every host (timezone, locale, nix settings,
+# core packages, sound, ssh). Update via `just update` then `just switch`.
 
 {
   imports =
@@ -19,9 +15,6 @@ in
 
   # Select internationalisation properties.
   i18n.defaultLocale = "en_CA.UTF-8";
-
-  environment.etc = {
-  };
 
   # Enable Flakes
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -44,13 +37,6 @@ in
     alsa.support32Bit = true;
     pulse.enable = true;
     wireplumber.enable = true;
-    
-    # If you want to use JACK applications, uncomment this
-    #jack.enable = true;
-
-    # use the example session manager (no others are packaged yet so this is enabled by default,
-    # no need to redefine it in your config for now)
-    #media-session.enable = true;
   };
 
   # Allow unfree packages
