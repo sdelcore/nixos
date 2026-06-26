@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# waybar-restart — kill any running waybar and start a fresh detached instance.
+# No -e: pkill/pgrep return non-zero when waybar isn't running, which is expected.
+set -uo pipefail
 
 echo "Attempting to stop any running instance of waybar..."
 pkill waybar

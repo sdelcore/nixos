@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# fkill — pick a process with fzf and kill it (signal optional, defaults to 9).
+# No -e: an escaped fzf yields an empty pid, handled gracefully below.
+set -uo pipefail
 
 pid=$(ps -ef | sed 1d | fzf | awk '{print $2}')
 

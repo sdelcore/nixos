@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# knownrm — pick a line in ~/.ssh/known_hosts with fzf and delete it.
+# No -e: an escaped fzf yields an empty selection, caught by the regex check.
+set -uo pipefail
 
 re='^[0-9]+$'
 line_number=$(cat -n ~/.ssh/known_hosts | fzf | awk '{print $1}')

@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# screen-recorder — toggle wf-recorder: first run records a slurp-selected
+# region to ~/Videos; second run stops it. No -e: pgrep returns non-zero when
+# not recording (expected), and an escaped slurp should just abort quietly.
+set -uo pipefail
 
 VIDEODIR="$HOME/Videos"
 DATE_FORMAT="+%Y-%m-%d_%H-%M-%S"

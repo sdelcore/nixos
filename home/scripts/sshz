@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
+# sshz — ssh to a host and attach (creating if needed) a zellij session "remote".
+set -euo pipefail
 
 if [ ! "$#" -gt 0 ]; then
-  echo "Need a server to connect to!"
+  echo "Need a server to connect to!" >&2
   exit 1
 fi
 
