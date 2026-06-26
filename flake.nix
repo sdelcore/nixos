@@ -1,5 +1,5 @@
 {
-    description = "A simple NixOS flake";
+    description = "NixOS + Home Manager configs for dayman (laptop), nightman (desktop), and lab";
 
     inputs = {
         nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
