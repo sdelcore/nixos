@@ -60,12 +60,6 @@
     fsType = "ext4";
     options = ["nofail" "x-gvfs-show" "nodev" "nosuid"];
   };
-  
-  fileSystems."/media/sdelcore/data2" = {
-    device = "/dev/disk/by-uuid/c883ccd5-6644-4eab-8fca-293bcfc4c06a";
-    fsType = "ext4";
-    options = ["nofail" "x-gvfs-show" "nodev" "nosuid"];
-  };
 
   swapDevices = [ {
     device = "/media/sdelcore/store/swapfile";
