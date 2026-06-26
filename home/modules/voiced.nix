@@ -28,7 +28,8 @@ in
       Environment = [
         "CUDA_VISIBLE_DEVICES=0"
         "WAYLAND_DISPLAY=wayland-1"
-        "XDG_RUNTIME_DIR=/run/user/1000"
+        # %t = the user runtime dir (/run/user/<uid>); avoids hardcoding uid 1000.
+        "XDG_RUNTIME_DIR=%t"
       ];
     };
   };
