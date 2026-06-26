@@ -97,33 +97,33 @@ while [[ $# -gt 0 ]]; do
             error "Unknown option: $1"
             ;;
         *)
-            HOSTNAME="$1"
+            TARGET_HOST="$1"
             shift
             ;;
     esac
 done
 
 # Validate hostname
-if [[ -z "${HOSTNAME:-}" ]]; then
+if [[ -z "${TARGET_HOST:-}" ]]; then
     error "Hostname is required. Use -h for help."
 fi
 
 # Check if configuration exists
-if ! nix flake show "$FLAKE_DIR" 2>/dev/null | grep -q "nixosConfigurations.*$HOSTNAME"; then
+if ! nix flake show "$FLAKE_DIR" 2>/dev/null | grep -q "nixosConfigurations.*$TARGET_HOST"; then
     log "Available configurations:"
     nix flake show "$FLAKE_DIR" 2>/dev/null | grep -A 100 "nixosConfigurations" | head -20
-    error "Configuration '$HOSTNAME' not found in flake"
+    error "Configuration '$TARGET_HOST' not found in flake"
 fi
 
-VM_SCRIPT="$FLAKE_DIR/result/bin/run-${HOSTNAME}-vm"
+VM_SCRIPT="$FLAKE_DIR/result/bin/run-${TARGET_HOST}-vm"
 
 # Build VM
 if [[ "$RUN_ONLY" != true ]]; then
-    log "Building VM for '$HOSTNAME'..."
-    log_verbose "Running: nixos-rebuild build-vm --flake $FLAKE_DIR#$HOSTNAME --impure"
+    log "Building VM for '$TARGET_HOST'..."
+    log_verbose "Running: nixos-rebuild build-vm --flake $FLAKE_DIR#$TARGET_HOST --impure"
 
     cd "$FLAKE_DIR"
-    if nixos-rebuild build-vm --flake ".#$HOSTNAME" --impure; then
+    if nixos-rebuild build-vm --flake ".#$TARGET_HOST" --impure; then
         log "Build successful!"
     else
         error "Build failed"
@@ -156,7 +156,7 @@ else
 fi
 
 # Run VM
-log "Starting VM '$HOSTNAME'..."
+log "Starting VM '$TARGET_HOST'..."
 log "  Memory: $MEMORY"
 log "  Cores: $CORES"
 log "  SSH Port: $SSH_PORT"

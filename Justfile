@@ -41,6 +41,8 @@ testvm-headless name="" port="2222":
 
 deploy name="" ip="" mode="switch":
     nixos-rebuild {{mode}} --flake .#{{name}} --use-remote-sudo --target-host {{ip}}
+    # `mode=boot` stages the config for next boot but doesn't activate it, so
+    # reboot the target to apply it. Other modes (switch) activate in place.
     {{ if mode == "boot" { "ssh " + ip + " sudo reboot now" } else { "" } }}
 
 # Provision with opnix token (1Password service account) to a new machine

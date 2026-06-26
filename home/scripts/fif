@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
+# fif — "find in files": ripgrep for a string, pick a match with fzf (live preview).
+set -uo pipefail
 
 if [ ! "$#" -gt 0 ]; then
-	echo "Need a string to search for!"
-	return 1
+	echo "Need a string to search for!" >&2
+	exit 1
 fi
 
 rg --hidden --glob '!.git' --files-with-matches --no-messages "$1" | fzf --preview "rg --ignore-case --pretty --context 10 '$1' {}"
