@@ -4,8 +4,11 @@
 
 | Host | Role | CPU | GPU | Storage | Features |
 |------|------|-----|-----|---------|----------|
-| **dayman** | Laptop | Intel | NVIDIA | NVMe (btrfs) | TLP, Thunderbolt, Lid controls |
-| **nightman** | Desktop | AMD | NVIDIA | NVMe + 4 drives | Triple monitors, Virtualization |
+| **dayman** | Laptop | Intel | NVIDIA | NVMe (disko) | TLP, Thunderbolt, Lid controls |
+| **nightman** | Desktop | AMD | NVIDIA | NVMe + drives (imperative) | Triple monitors, Virtualization |
+| **lab** | SBC / lab box | — | — | SATA (disko) | Minimal Hyprland, firewall off |
+
+There is also a `testvm` target — a throwaway VM build (GNOME desktop) used to test config changes; it is not a physical host.
 
 ## 🚀 Features
 
@@ -18,14 +21,14 @@
 - **Hyprland** (Wayland compositor) with extensive customization
 - **Catppuccin Macchiato** theme throughout
 - **Waybar**, **Wofi**, **SwayNC** for desktop utilities
-- Alternative: GNOME/KDE support available
+- GNOME is also available (used by the `testvm` target)
 
 ### Development Stack
 - **Editors**: Cursor, VS Code, Neovim (LazyVim), Claude Code
 - **Languages**: Python, Node.js, Go
 - **Tools**: Git, Direnv, FZF, Ripgrep, Bat
 - **Containers**: Docker, Libvirt/QEMU
-- **Terminal**: Zsh + Starship, Zellij/Tmux
+- **Terminal**: Zsh + Starship, Zellij
 
 ### Agent Tooling
 - **Claude Code**, **opencode**, **pi** managed via Home Manager modules
@@ -35,17 +38,19 @@
 ### Security & Auth
 - **1Password** integration
 - **YubiKey** support (PAM U2F)
-- **SOPS** for secret management (TBD)
-- **WireGuard** VPN (TBD)
+- **opnix** (1Password-backed) for secret management
+- **NetBird** mesh VPN (see `nix/modules/network/netbird.nix`)
 
 ## 🛠️ Usage
 
 ### Quick Commands
 ```bash
-just update          # Update flake inputs
-just switch          # Apply configuration
-just build hostname  # Build specific host
-just deploy host ip  # Remote deployment
+just update              # Update flake inputs
+just switch              # Apply configuration (current host)
+just build hostname      # Build a specific host without applying
+just deploy host ip      # Remote deployment
+just testvm hostname     # Boot a host config in a throwaway VM
+just testvm-headless h   # Same, headless with SSH on a forwarded port
 ```
 
 ### Initial Setup
@@ -57,7 +62,9 @@ just deploy host ip  # Remote deployment
 ### Maintenance
 - **Updates**: `just update` then `just switch`
 - **Garbage collection**: Runs automatically (daily, 3-day retention)
-- **VM testing**: `just buildvm hostname`
+- **VM testing**: `just buildvm hostname`, or `just testvm hostname` to boot it
+
+> Each host pins its own `system.stateVersion` (set at install time and intentionally left alone per host — it is not a "current NixOS version" and should not be bumped on upgrade).
 
 ## 📁 Structure
 
