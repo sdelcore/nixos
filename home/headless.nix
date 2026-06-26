@@ -2,32 +2,18 @@
 
 {
   imports = [
-    ./modules/atuin.nix
-    ./modules/bat.nix
-    ./modules/claude-code/default.nix
-    ./modules/direnv.nix
-    ./modules/fzf.nix
-    ./modules/git.nix
-    ./modules/lazygit.nix
-    ./modules/lazydocker.nix
-    ./modules/neovim.nix
-    ./modules/zsh.nix
-    ./modules/zellij.nix
-    ./modules/zoxide.nix
+    ./modules/cli.nix # shared CLI toolset + catppuccin theme
+    ./modules/lazydocker.nix # headless-only extra (servers run containers)
   ];
 
-  # Base home-manager settings for standalone deployment
+  # Base home-manager settings for standalone (non-NixOS) deployment. These
+  # mirror modules/base.nix but stay inline: base.nix also pulls in desktop-only
+  # bits (virt-manager dconf, lxqt askpass) that don't belong on a headless box.
   home.username = username;
   home.homeDirectory = "/home/${username}";
   home.stateVersion = "24.05";
 
   programs.home-manager.enable = true;
-
-  # Catppuccin theme
-  catppuccin = {
-    flavor = "macchiato";
-    accent = "lavender";
-  };
 
   # Ensure XDG directories exist
   xdg.enable = true;
