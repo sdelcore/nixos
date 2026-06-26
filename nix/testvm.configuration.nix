@@ -9,7 +9,10 @@
     ./modules/virtualization/nix-testvm.nix
   ];
 
-  networking.hostName = "dayman";  # Use dayman to reuse 1Password secrets
+  # Deliberately impersonates dayman: opnix resolves secrets by hostname, so the
+  # throwaway test VM borrows dayman's identity to reuse the same 1Password items
+  # instead of needing its own. This is the only host whose name != its config name.
+  networking.hostName = "dayman";
 
   # Minimal filesystem for VM (overridden by build-vm at runtime)
   fileSystems."/" = {

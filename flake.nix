@@ -115,7 +115,7 @@
         };
 
         # System configuration factory
-        mkSystem = hostname: { extraModules ? [], homeFile ? null, extraHomeSpecialArgs ? {} }:
+        mkSystem = hostname: { extraModules ? [], extraHomeSpecialArgs ? {} }:
             nixpkgs.lib.nixosSystem {
                 inherit system;
                 specialArgs = { inherit inputs primaryUser; };
@@ -123,7 +123,7 @@
                     ./nix/${hostname}.configuration.nix
                     unstableOverlay
                     home-manager.nixosModules.home-manager
-                    (mkHomeManagerConfig (if homeFile != null then homeFile else ./home/${hostname}.nix) 
+                    (mkHomeManagerConfig ./home/${hostname}.nix
                         ({ inherit inputs; } // extraHomeSpecialArgs))
                 ] ++ extraModules;
             };
