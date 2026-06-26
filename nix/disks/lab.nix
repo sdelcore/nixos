@@ -1,18 +1,13 @@
-# Example to create a bios compatible gpt partition
+# Disko disk layout for lab: GPT with an ESP + ext4 root on /dev/sda.
 { lib, ... }:
 {
   disko.devices = {
     disk.main = {
-      device = lib.mkDefault "/dev/nvme0n1";
+      device = lib.mkDefault "/dev/sda";
       type = "disk";
       content = {
         type = "gpt";
         partitions = {
-          boot = {
-            name = "boot";
-            size = "1M";
-            type = "EF02";
-          };
           esp = {
             name = "ESP";
             size = "500M";
@@ -21,6 +16,7 @@
               type = "filesystem";
               format = "vfat";
               mountpoint = "/boot";
+              mountOptions = [ "fmask=0077" "dmask=0077" ];
             };
           };
           root = {
@@ -28,7 +24,7 @@
             size = "100%";
             content = {
               type = "filesystem";
-              format = "btrfs";
+              format = "ext4";
               mountpoint = "/";
             };
           };

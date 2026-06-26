@@ -1,12 +1,19 @@
+# Disko disk layout for dayman: GPT with a BIOS-boot partition + ESP, btrfs root
+# on /dev/nvme0n1.
 { lib, ... }:
 {
   disko.devices = {
     disk.main = {
-      device = lib.mkDefault "/dev/sda";
+      device = lib.mkDefault "/dev/nvme0n1";
       type = "disk";
       content = {
         type = "gpt";
         partitions = {
+          boot = {
+            name = "boot";
+            size = "1M";
+            type = "EF02";
+          };
           esp = {
             name = "ESP";
             size = "500M";
@@ -15,7 +22,6 @@
               type = "filesystem";
               format = "vfat";
               mountpoint = "/boot";
-              mountOptions = [ "fmask=0077" "dmask=0077" ];
             };
           };
           root = {
@@ -23,7 +29,7 @@
             size = "100%";
             content = {
               type = "filesystem";
-              format = "ext4";
+              format = "btrfs";
               mountpoint = "/";
             };
           };

@@ -1,7 +1,7 @@
 { ... }: {
   imports = [
     ./hardware/dayman.nix
-    ./disks/nvme0n1.full.nix
+    ./disks/dayman.nix
     ./profiles/base.nix
     ./profiles/desktop.nix
     ./profiles/development.nix
