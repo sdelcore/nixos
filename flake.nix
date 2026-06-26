@@ -147,10 +147,11 @@
     in {
         # Standalone home-manager configurations for non-NixOS VMs
         # Usage: nix run home-manager/release-25.11 -- switch --flake .#headless
+        # Two names for the same standalone config (both build home/headless.nix
+        # for user "sdelcore"): "headless" is the descriptive alias, "sdelcore"
+        # the convenience default.
         homeConfigurations = {
-            # Default config using "sdelcore" username
             "sdelcore" = mkHomeConfig "sdelcore";
-            # Generic headless config
             "headless" = mkHomeConfig "sdelcore";
         };
 

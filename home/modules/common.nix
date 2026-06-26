@@ -1,31 +1,16 @@
 {...}: {
   imports = [
-    ../modules/alacritty.nix
-    ../modules/atuin.nix
-    ../modules/ssh.nix
-    ../modules/bat.nix
-    ../modules/bottom.nix
-    ../modules/agent-skills/default.nix
-    ../modules/claude-code/default.nix
-    ../modules/direnv.nix
-    ../modules/fzf.nix
-    ../modules/git.nix
-    ../modules/lazygit.nix
-    ../modules/mcp.nix
-    ../modules/neovim.nix
-    ../modules/opencode/default.nix
-    ../modules/pi/default.nix
-    ../modules/scripts.nix
-    ../modules/rofi.nix
-    ../modules/zsh.nix
-    ../modules/zellij.nix
-    ../modules/zen-browser.nix
-    ../modules/zoxide.nix
+    ./cli.nix # shared CLI toolset + catppuccin theme
+    # Desktop / GUI-adjacent additions on top of the shared CLI set:
+    ./alacritty.nix
+    ./ssh.nix
+    ./bottom.nix
+    ./agent-skills/default.nix
+    ./mcp.nix
+    ./opencode/default.nix
+    ./pi/default.nix
+    ./scripts.nix
+    ./rofi.nix
+    ./zen-browser.nix
   ];
-
-  # Catpuccin flavor and accent
-  catppuccin = {
-    flavor = "macchiato";
-    accent = "lavender";
-  };
 }
