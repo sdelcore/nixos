@@ -3,7 +3,7 @@
 # Enrolls this machine into the `personal` group (full reach to the homelab via
 # the routing peer + DNS for sdelcore.com over the tunnel). The setup key comes
 # from 1Password via opnix.
-{ config, lib, ... }:
+{ config, lib, pkgs, ... }:
 with lib;
 let
   cfg = config.services.netbirdClient;
@@ -24,6 +24,12 @@ in
       reference = "op://Infrastructure/netbird-setup-keys/personal";
       mode = "0400";
     };
+
+    # nixos-25.11 stable ships netbird 0.60.2; run the daemon and the desktop
+    # tray (netbird-ui) from unstable to track the server. `ui.enable` defaults
+    # to graphical-session presence, so the tray app lands on dayman/nightman.
+    services.netbird.package = pkgs.unstable.netbird;
+    services.netbird.ui.package = pkgs.unstable.netbird-ui;
 
     services.netbird.clients.nb0 = {
       port               = 51820;
