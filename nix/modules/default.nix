@@ -115,6 +115,9 @@
       package = pkgs.nix-ld;
   };
 
+  # Resolve /usr/bin & /bin shebangs for prebuilt binaries (pairs with nix-ld).
+  services.envfs.enable = true;
+
   # Garbage Collection
   # Keeps space down
   nix = {
