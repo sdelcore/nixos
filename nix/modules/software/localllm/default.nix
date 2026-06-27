@@ -11,5 +11,6 @@
   imports = [
     ./vllm.nix
     ./unsloth-studio.nix
+    ./llama-swap.nix
   ];
 }
