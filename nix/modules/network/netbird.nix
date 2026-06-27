@@ -3,12 +3,20 @@
 # Enrolls this machine into the `personal` group (full reach to the homelab via
 # the routing peer + DNS for sdelcore.com over the tunnel). The setup key comes
 # from 1Password via opnix.
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 with lib;
 let
   cfg = config.services.netbirdClient;
 in
 {
+  # The netbird NixOS module is version-coupled to the netbird-ui desktop-file
+  # layout: the stable 25.11 module wraps the tray by replacing an absolute
+  # `…/bin/netbird-ui` path that unstable's netbird-ui no longer ships, so it
+  # can't build against the unstable package. Pull the whole module from
+  # unstable so the module, daemon, and tray (set below) are all matched.
+  disabledModules = [ "services/networking/netbird.nix" ];
+  imports = [ "${inputs.nixpkgs-unstable}/nixos/modules/services/networking/netbird.nix" ];
+
   options.services.netbirdClient = {
     enable = mkEnableOption "NetBird mesh client (personal peer)";
     managementUrl = mkOption {
