@@ -5,34 +5,37 @@ with lib;
 let
   enabled = config.networking.hostName == "nightman";
 
-  # CUDA + MTP need llama.cpp >= 9180; stable nixpkgs is too old, so pull it from
-  # unstable with cudaSupport (same pattern as vllm.nix).
   unstable = import inputs.nixpkgs-unstable {
     inherit (pkgs) system;
     config = { allowUnfree = true; cudaSupport = true; };
   };
+  llamaServer = "${unstable.llama-cpp}/bin/llama-server";
 
   port = 9292;
-  modelName = "Qwen3.6-35B-A3B-MTP";
-  # Resolved + cached by llama-server (repo:quant), not a hardcoded snapshot path.
-  hfModel = "unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q4_K_XL";
 
-  # --cpu-moe keeps the MoE expert weights on CPU (the bulk of a 35B-A3B); only
-  # the active path lives in VRAM, so it fits a 24GB card. MTP via --spec-type.
-  llamaSwapConfig = pkgs.writeText "llama-swap.yaml" ''
-    healthCheckTimeout: 600
-    startPort: 9300
-    models:
-      "${modelName}":
-        cmd: |
-          ${unstable.llama-cpp}/bin/llama-server
-          -hf ${hfModel}
-          --host 127.0.0.1 --port ''${PORT}
-          --ctx-size 16384 --n-gpu-layers 999 --cpu-moe --flash-attn on
-          --cache-type-k q8_0 --cache-type-v q8_0 -np 1
-          --spec-type draft-mtp --spec-draft-n-max 2
-        ttl: 900
-  '';
+  models = {
+    "Qwen3.6-35B-A3B-MTP" = {
+      hf = "unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q4_K_XL";
+      extra = "--cpu-moe --spec-type draft-mtp --spec-draft-n-max 2";
+    };
+    "Qwen3-8B" = {
+      hf = "unsloth/Qwen3-8B-GGUF:Q4_K_M";
+      extra = "";
+    };
+    "Phi-4" = {
+      hf = "unsloth/phi-4-GGUF:Q4_K_M";
+      extra = "";
+    };
+  };
+
+  mkModel = name: m:
+    "  \"${name}\":\n" +
+    "    cmd: ${llamaServer} -hf ${m.hf} --host 127.0.0.1 --port \${PORT} --ctx-size 16384 --n-gpu-layers 999 --flash-attn on --cache-type-k q8_0 --cache-type-v q8_0 -np 1 ${m.extra}\n" +
+    "    ttl: 900\n";
+
+  llamaSwapConfig = pkgs.writeText "llama-swap.yaml"
+    ("healthCheckTimeout: 600\nstartPort: 9300\nmodels:\n"
+      + concatStrings (mapAttrsToList mkModel models));
 in
 {
   config = mkIf enabled {
@@ -49,8 +52,6 @@ in
       };
     };
 
-    # No auth (LAN desktop, open for any LAN PC); reachable as nightman.tap:9292
-    # for the LiteLLM gateway and other machines.
     networking.firewall.allowedTCPPorts = [ port ];
   };
 }
