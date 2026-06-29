@@ -53,6 +53,11 @@
             url = "github:sdelcore/droidcode";
             inputs.nixpkgs.follows = "nixpkgs";
         };
+        # shared — self-hosted static-site platform; we use its `shared` deploy CLI.
+        shared = {
+            url = "github:sdelcore/shared";
+            inputs.nixpkgs.follows = "nixpkgs";
+        };
         zjstatus = {
             url = "github:dj95/zjstatus";
         };
@@ -73,6 +78,7 @@
         sagent,
         wagent,
         droidcode,
+        shared,
         zjstatus
     }:
     let 
