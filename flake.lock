@@ -348,6 +348,7 @@
         "nur": "nur",
         "opnix": "opnix",
         "sagent": "sagent",
+        "shared": "shared",
         "voiced": "voiced",
         "wagent": "wagent",
         "zen-browser": "zen-browser",
@@ -393,6 +394,26 @@
       "original": {
         "owner": "sdelcore",
         "repo": "sagent",
+        "type": "github"
+      }
+    },
+    "shared": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1781525774,
+        "narHash": "sha256-n3dK/bZzZu+VW8qCKX/qqWPv8VXQPShy2wBd+36ML+E=",
+        "owner": "sdelcore",
+        "repo": "shared",
+        "rev": "d3de9bbe5d9ed0e8b287eeb66dc6cbcd426ffff1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "sdelcore",
+        "repo": "shared",
         "type": "github"
       }
     },
