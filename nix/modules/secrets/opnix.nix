@@ -218,6 +218,12 @@ in
       if [ -f "$PRIV" ] && [ -f "$PUB" ]; then
         cp "$PRIV" "/etc/ssh/ssh_host_''${KEY_TYPE}_key"
         cp "$PUB" "/etc/ssh/ssh_host_''${KEY_TYPE}_key.pub"
+        # opnix strips the trailing newline from stored secrets, but OpenSSH
+        # refuses to load a private key whose final line isn't newline-
+        # terminated ("error in libcrypto: unsupported") and silently falls
+        # back to an auto-generated host key — only surfacing after a reboot.
+        # Restore the newline if missing (matters for ed25519 host keys).
+        [ -n "$(tail -c1 "/etc/ssh/ssh_host_''${KEY_TYPE}_key")" ] && echo >> "/etc/ssh/ssh_host_''${KEY_TYPE}_key"
         chmod 600 "/etc/ssh/ssh_host_''${KEY_TYPE}_key"
         chmod 644 "/etc/ssh/ssh_host_''${KEY_TYPE}_key.pub"
         chown root:root "/etc/ssh/ssh_host_''${KEY_TYPE}_key"
