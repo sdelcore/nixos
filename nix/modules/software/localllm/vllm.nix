@@ -13,6 +13,18 @@ let
       # 0.20.0. Drop this allow once unstable ships vllm >= 0.20.0.
       permittedInsecurePackages = [ "python3.13-vllm-0.16.0" ];
     };
+    overlays = [
+      (final: prev: {
+        python3Packages = prev.python3Packages.overrideScope (pythonFinal: pythonPrev: {
+          prometheus-fastapi-instrumentator = pythonPrev.prometheus-fastapi-instrumentator.overridePythonAttrs (old: {
+            postPatch = (old.postPatch or "") + ''
+              substituteInPlace pyproject.toml \
+                --replace-fail 'starlette (>=0.30.0,<1.0.0)' 'starlette (>=0.30.0)'
+            '';
+          });
+        });
+      })
+    ];
   };
 
   # Unstable vllm 0.16.0's csrc/cpu/utils.hpp calls `at::cpu::L2_cache_size()`,
