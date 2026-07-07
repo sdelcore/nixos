@@ -50,14 +50,6 @@ in
     "$HOME/.npm-global/bin"
   ];
 
-  # Load OPENCODE_API_KEY from opnix secret so pi can use OpenCode Zen.
-  # Pi has built-in support for the `opencode` provider and reads this env var.
-  home.sessionVariablesExtra = ''
-    if [ -r /var/lib/opnix/secrets/opencodeApiKey ]; then
-      export OPENCODE_API_KEY=$(cat /var/lib/opnix/secrets/opencodeApiKey)
-    fi
-  '';
-
   home.file = extensionEntries // {
     # Share the global agent instructions with Claude and opencode by
     # sourcing the same CLAUDE.md file. Pi loads ~/.pi/agent/AGENTS.md
