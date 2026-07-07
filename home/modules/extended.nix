@@ -6,7 +6,6 @@
     ../modules/go.nix
     ../modules/lazydocker.nix
     ../modules/lmstudio.nix
-    ../modules/readwise/default.nix
     ../modules/voiced.nix
   ];
 }
