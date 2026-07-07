@@ -1,7 +1,9 @@
 { inputs, lib, config, pkgs, osConfig, ... }:
 let
   cfg = config.services.sagent;
-  sagent = inputs.sagent.packages.${pkgs.system}.default;
+  sagent = inputs.sagent.packages.${pkgs.system}.default.overrideAttrs (old: {
+    nativeBuildInputs = (old.nativeBuildInputs or []) ++ [ pkgs.git ];
+  });
   hostname = osConfig.networking.hostName or "unknown-host";
 
   # Optional wrapper that exports ANTHROPIC_API_KEY from a raw-content
