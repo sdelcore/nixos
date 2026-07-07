@@ -29,7 +29,7 @@
             status = "enable";
           }
           {
-            criteria = "HP Inc. HP E24 G4 CN42051QKF";
+            criteria = "HP Inc. HP E243 CNC8141VVB";
             status = "enable";
             position = "0,0";
           }
@@ -56,7 +56,7 @@
             mode = "3440x1440@99.98Hz";
           }
           {
-            criteria = "HP Inc. HP E24 G4 CN42051QKF";
+            criteria = "HP Inc. HP E243 CNC8141VVB";
             status = "enable";
             position = "0,0";
           }
