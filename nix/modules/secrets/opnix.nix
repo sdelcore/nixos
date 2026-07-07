@@ -121,17 +121,11 @@ in
       mode = "0444";  # User-readable for opencode
     };
 
-    # OpenCode Zen API key for pi coding agent
-    secrets."opencodeApiKey" = {
-      reference = "op://Infrastructure/OpenCode/credential";
-      mode = "0444";  # User-readable for pi
-    };
-
-    # Unsloth Studio API key for pi's local model provider (nightman only —
-    # the RTX 4090 + Studio live there). Lets pi reach the on-box
-    # OpenAI-compatible endpoint at http://localhost:8888/v1.
-    secrets."unslothApiKey" = lib.mkIf (hostName == "nightman") {
-      reference = "op://Infrastructure/Unsloth Nightman API/credential";
+    # LiteLLM gateway key for pi. Pi points at the self-hosted LiteLLM proxy
+    # (ai VM, http://llm.ai.tap/v1) as its single model source, so all model
+    # management lives in LiteLLM. Dedicated virtual key, scoped/revocable.
+    secrets."litellmApiKey" = {
+      reference = "op://Infrastructure/LiteLLM pi/credential";
       mode = "0444";  # User-readable for pi
     };
 
