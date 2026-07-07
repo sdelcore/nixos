@@ -48,7 +48,7 @@ in
                 models: [
                   { id: "anthropic/claude-opus-4-8", name: "Claude Opus 4.8 (Zen)", reasoning: true, input: ["text", "image"], contextWindow: 200000, maxTokens: 32000, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 } },
                   { id: "anthropic/claude-sonnet-5", name: "Claude Sonnet 5 (Zen)", reasoning: true, input: ["text", "image"], contextWindow: 200000, maxTokens: 32000, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 } },
-                  { id: "kimi/kimi-k2.6", name: "Kimi K2.6 (Zen)", reasoning: false, input: ["text"], contextWindow: 262144, maxTokens: 8192, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 } },
+                  { id: "kimi/kimi-k2.7-code", name: "Kimi K2.7 Code (Zen)", reasoning: false, input: ["text"], contextWindow: 262144, maxTokens: 8192, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 } },
                   { id: "glm/glm-5.2", name: "GLM 5.2 (Zen)", reasoning: false, input: ["text"], contextWindow: 131072, maxTokens: 8192, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 } },
                   { id: "deepseek/deepseek-v4-pro", name: "DeepSeek V4 Pro (Zen)", reasoning: true, input: ["text"], contextWindow: 131072, maxTokens: 8192, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 } },
                   { id: "local/Qwen3.6-35B-A3B-MTP", name: "Qwen3.6 35B-A3B MTP (local)", reasoning: false, input: ["text"], contextWindow: 32768, maxTokens: 8192, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 } }
