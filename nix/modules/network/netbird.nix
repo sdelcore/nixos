@@ -48,6 +48,12 @@ in
       login.systemdDependencies = [ "opnix-secrets.service" ];
     };
 
+    # The daemon's socket lives in /run/netbird-nb0 (RuntimeDirectoryMode=0750,
+    # group netbird-nb0). netbird-ui runs as the desktop user, so without this
+    # membership it can't traverse the dir to reach the socket — the tray menu
+    # renders but daemon-backed panels (Settings) come up blank.
+    users.users.sdelcore.extraGroups = [ "netbird-nb0" ];
+
     # `netbird up` reads NB_MANAGEMENT_URL to register against the self-hosted
     # server (don't pre-seed config.json — ManagementURL is a parsed url.URL
     # there, and a string crashes the daemon).
