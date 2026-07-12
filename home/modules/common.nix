@@ -9,6 +9,7 @@
     ./mcp.nix
     ./opencode/default.nix
     ./pi/default.nix
+    ./codex.nix
     ./scripts.nix
     ./rofi.nix
     ./zen-browser.nix
