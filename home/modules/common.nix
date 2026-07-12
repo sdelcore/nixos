@@ -10,6 +10,7 @@
     ./opencode/default.nix
     ./pi/default.nix
     ./codex.nix
+    ./omp.nix
     ./scripts.nix
     ./rofi.nix
     ./zen-browser.nix
