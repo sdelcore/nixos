@@ -28,8 +28,10 @@ in
   # path so the installer never falls back to a bun-based source install; it
   # drops omp into ~/.local/bin and leaves shell rc files alone. Update by
   # re-running the installer (rm ~/.local/bin/omp + activate).
+  # The installer shells out to grep/sed/uname/mktemp, which aren't in
+  # home-manager's minimal activation PATH.
   home.activation.installOmp = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    export PATH="${pkgs.curl}/bin:$PATH"
+    export PATH="${lib.makeBinPath (with pkgs; [ curl coreutils gnugrep gnused ])}:$PATH"
     if [ ! -f "$HOME/.local/bin/omp" ]; then
       echo "Installing oh-my-pi..."
       ${pkgs.curl}/bin/curl -fsSL https://omp.sh/install | ${pkgs.bash}/bin/bash -s -- --binary
