@@ -1,4 +1,4 @@
-{ lib, primaryUser, ... }: {
+{ lib, pkgs, primaryUser, ... }: {
   imports = [
     ./hardware/lab.nix
     ./disks/lab.nix
@@ -7,6 +7,21 @@
 
   networking.hostName = "lab";
   networking.firewall.enable = false;
+
+  # Minimal Sway session for the web-search browser: greetd auto-logs
+  # straight into sway on the console, no display manager.
+  hardware.graphics.enable = true;
+  programs.sway = {
+    enable = true;
+    xwayland.enable = true;
+  };
+  services.greetd = {
+    enable = true;
+    settings.default_session = {
+      command = "${pkgs.sway}/bin/sway";
+      user = primaryUser;
+    };
+  };
 
   # No opnix token on this box — local password instead of 1Password.
   services.onepassword-secrets.enable = lib.mkForce false;

@@ -2,7 +2,6 @@
 
 {
     imports = [
-        ./modules/base.nix
-        ./modules/cli.nix
+        ./headless.nix
     ];
 }
