@@ -7,6 +7,9 @@
 
   networking.hostName = "lab";
   networking.firewall.enable = false;
+  # Box suspends when idle (see below) — wake it with a WoL magic packet
+  # to 2C:F7:F1:20:0F:C7 (e.g. `wakeonlan` from any LAN host).
+  networking.interfaces.enp3s0.wakeOnLan.enable = true;
 
   # Minimal Sway session for the web-search browser: greetd auto-logs
   # straight into sway on the console, no display manager.
