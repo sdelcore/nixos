@@ -23,6 +23,16 @@
     };
   };
 
+  # Idle: screen off after 15 min, suspend after 30. The base profile
+  # disables the sleep targets, so re-enable them for this host.
+  systemd.targets.sleep.enable = lib.mkForce true;
+  systemd.targets.suspend.enable = lib.mkForce true;
+  environment.etc."sway/config.d/idle.conf".text = ''
+    exec swayidle -w \
+      timeout 900 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
+      timeout 1800 'systemctl suspend'
+  '';
+
   # No opnix token on this box — local password instead of 1Password.
   services.onepassword-secrets.enable = lib.mkForce false;
   users.users.${primaryUser} = {
