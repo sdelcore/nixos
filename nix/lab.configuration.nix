@@ -10,6 +10,7 @@
 
   # Minimal Sway session for the web-search browser: greetd auto-logs
   # straight into sway on the console, no display manager.
+  environment.systemPackages = [ pkgs.chromium ];
   hardware.graphics.enable = true;
   programs.sway = {
     enable = true;
