@@ -173,6 +173,9 @@
 
             lab = mkSystem "lab" {
                 extraModules = [ disko.nixosModules.disko ];
+                # home/headless.nix's `username ? "sdelcore"` default is not
+                # honored when imported as a HM module — pass it explicitly.
+                extraHomeSpecialArgs = { username = primaryUser; };
             };
         };
     };
