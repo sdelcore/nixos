@@ -515,11 +515,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782566918,
-        "narHash": "sha256-cLXbvpLlraRRdubkcSe2y5B4uiuM2kP3hj4wUvjW6N0=",
+        "lastModified": 1784501760,
+        "narHash": "sha256-AvGRDISeFGqthfmrqAVtmxfcSZnUaj2Jyr91XdE6PcA=",
         "owner": "sdelcore",
         "repo": "voiced",
-        "rev": "54615494167ce16dc93b399dd83f8751981556f3",
+        "rev": "ead75e912de22c2a94b8a90cdb649dad0006abcf",
         "type": "github"
       },
       "original": {
