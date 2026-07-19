@@ -35,11 +35,21 @@ in
   };
 
   # Default configuration
+  # Models are fixed in voiced 0.4.0: Parakeet-TDT v3 (STT), Kokoro-82M (TTS).
   xdg.configFile."voiced/config.toml".text = ''
+    # Auto-unload idle STT/TTS models from the GPU after this many minutes
+    # (0 = never). Shared by both so they always match.
+    unload_timeout_minutes = 60
+
     [transcription]
-    model = "nvidia/parakeet-tdt-0.6b-v3"  # NeMo ASRModel HF id
     device = "auto"          # auto, cuda, cpu
     language = "en"          # advisory only; Parakeet TDT v3 auto-detects
+
+    # Fix words the model habitually mishears (case-insensitive,
+    # word-boundary matched)
+    [transcription.replacements]
+    "cloud code" = "Claude Code"
+    "hyperland" = "Hyprland"
 
     [audio]
     sample_rate = 16000
@@ -48,12 +58,10 @@ in
     beep_enabled = true      # audio feedback on start/stop
 
     [tts]
-    enabled = true           # Enable TTS (requires VibeVoice)
-    model = "microsoft/VibeVoice-Realtime-0.5B"
-    device = "auto"          # auto, cuda, mps, cpu
-    default_voice = "emma"   # carter, davis, emma, frank, grace, mike
-    cfg_scale = 1.5          # Classifier-free guidance scale
-    unload_timeout_minutes = 60  # Auto-unload model after inactivity (0 = never)
+    enabled = true              # Enable TTS (Kokoro-82M)
+    device = "auto"             # auto, cuda, cpu
+    default_voice = "af_heart"  # see `voiced voices list`
+    speed = 1.0                 # Speech rate multiplier
 
     [diarization]
     device = "auto"          # auto, cuda, cpu
