@@ -31,9 +31,8 @@ There is also a `testvm` target — a throwaway VM build (GNOME desktop) used to
 - **Terminal**: Zsh + Starship, Zellij
 
 ### Agent Tooling
-- **Claude Code**, **opencode**, **pi** managed via Home Manager modules
-- Shared skills under `home/modules/agent-skills/skills/` symlink into `~/.claude/skills/` and `~/.agents/skills/` so all three agents see the same `SKILL.md` set
-- Pi extensions auto-discovered from `home/modules/pi/extensions/`; locally-dropped extensions in `~/.pi/agent/extensions/` survive activations
+- **Claude Code**, **OpenCode**, **Codex**, and **OMP** managed via Home Manager modules
+- Shared skills under `home/modules/agent-skills/skills/` symlink into `~/.claude/skills/` and `~/.agents/skills/`
 
 ### Security & Auth
 - **1Password** integration
@@ -81,10 +80,10 @@ just testvm-headless h   # Same, headless with SSH on a forwarded port
 └── home/
     ├── <host>.nix           # Per-host Home Manager config
     ├── modules/             # Home Manager modules (shell, editors, desktop apps)
-    │   ├── agent-skills/    # Shared SKILL.md set for Claude/opencode/pi
+    │   ├── agent-skills/    # Shared SKILL.md set for coding agents
     │   ├── claude-code/     # Claude Code commands, plugins, settings
     │   ├── opencode/
-    │   ├── pi/              # pi coding agent + auto-discovered extensions
+    │   ├── omp.nix          # OMP coding agent and LiteLLM discovery
     │   └── hyprland/
     ├── configs/             # Application dotfiles
     ├── scripts/

@@ -12,7 +12,7 @@ let
 
   # Symlink each skill directory into both default discovery roots:
   #   ~/.claude/skills/<name>/   — read by Claude Code
-  #   ~/.agents/skills/<name>/   — read natively by opencode and pi
+  #   ~/.agents/skills/<name>/   — read natively by opencode and OMP
   # Recursive directory entries pull in SKILL.md plus any bundled reference
   # docs (LANGUAGE.md, tests.md, etc.) the skill links to. The skills/ parent
   # directory itself stays writable, so users can drop additional skill dirs

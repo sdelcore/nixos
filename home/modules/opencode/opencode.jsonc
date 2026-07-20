@@ -1,11 +1,16 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  // Theme configuration
-  //"theme": "opencode",
-  //"model": "anthropic/claude-sonnet-4-20250514",
   "autoupdate": true,
-  // Server configuration - enable mDNS for discovery
-  "server": {
-    "mdns": true
+  "plugin": ["opencode-plugin-litellm@latest"],
+  "enabled_providers": ["litellm", "litellm-responses"],
+  "provider": {
+    "litellm": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "LiteLLM",
+      "options": {
+        "baseURL": "http://llm.ai.tap/v1",
+        "apiKey": "{env:LITELLM_API_KEY}"
+      }
+    }
   }
 }
