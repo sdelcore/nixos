@@ -13,12 +13,16 @@
 
   home.sessionVariables = {
     OPENCODE_ENABLE_EXA = "true";
+    LITELLM_BASE_URL = "http://llm.ai.tap";
   };
 
   # Load EXA_API_KEY from opnix secret for interactive sessions
   home.sessionVariablesExtra = ''
     if [ -r /var/lib/opnix/secrets/exaApiKey ]; then
-      export EXA_API_KEY=$(cat /var/lib/opnix/secrets/exaApiKey)
+      export EXA_API_KEY=$(${pkgs.coreutils}/bin/cat /var/lib/opnix/secrets/exaApiKey)
+    fi
+    if [ -r /var/lib/opnix/secrets/litellmApiKey ]; then
+      export LITELLM_API_KEY=$(${pkgs.coreutils}/bin/cat /var/lib/opnix/secrets/litellmApiKey)
     fi
   '';
 
@@ -52,7 +56,7 @@
     Service = {
       Type = "simple";
       # Load EXA_API_KEY from opnix secret and start server
-      ExecStart = "${pkgs.bash}/bin/bash -c 'if [ -r /var/lib/opnix/secrets/exaApiKey ]; then export EXA_API_KEY=$(cat /var/lib/opnix/secrets/exaApiKey); fi; exec %h/.opencode/bin/opencode serve'";
+      ExecStart = "${pkgs.bash}/bin/bash -c 'if [ -r /var/lib/opnix/secrets/exaApiKey ]; then export EXA_API_KEY=$(${pkgs.coreutils}/bin/cat /var/lib/opnix/secrets/exaApiKey); fi; if [ -r /var/lib/opnix/secrets/litellmApiKey ]; then export LITELLM_API_KEY=$(${pkgs.coreutils}/bin/cat /var/lib/opnix/secrets/litellmApiKey); fi; exec %h/.opencode/bin/opencode serve'";
       Restart = "on-failure";
       RestartSec = 5;
       # Set working directory for session context
