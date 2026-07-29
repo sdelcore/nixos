@@ -39,7 +39,8 @@ Homelab deployment: server at `shared.tap` (10.0.0.24); sites live at
       const items = await todos.list();
       list.innerHTML = items.map(t => `<li>${t.text}</li>`).join('');
     }
-    todos.subscribe(render);          // realtime: re-render on any change
+    // realtime: re-render on any change (handlers object, NOT a bare callback)
+    todos.subscribe({ onCreate: render, onUpdate: render, onDelete: render });
     render();
     todos.create({ text: 'first todo' });
   </script>
@@ -56,17 +57,47 @@ const all = await posts.list();          // sorted by createdAt
 const one = await posts.get(doc.id);
 await posts.update(doc.id, { title: 'hello' });
 await posts.delete(doc.id);
-const off = posts.subscribe(e => { /* e.type: created|updated|deleted, e.doc */ });
+
+// subscribe takes a HANDLERS OBJECT, not a callback. A bare function is
+// accepted and then silently never fires — the most common way to ship a
+// dead realtime UI here.
+const sub = posts.subscribe({
+  onCreate: doc => {},
+  onUpdate: doc => {},
+  onDelete: doc => {},   // receives { id } on reconnect-replay, the full doc live
+});
+sub.close();             // returns { close }, not an unsubscribe function
 ```
+Each handler receives the document itself — there is no event wrapper, so no
+`e.type` / `e.doc`. The socket resyncs on reconnect and replays whatever was
+missed through the same handlers.
 
 ### `shared.ai` — AI chat proxy (key + model live on the server)
 ```js
+// chat(messages, opts) — two positional args. A string is wrapped for you.
 const reply = await shared.ai.chat('Summarize this in one line: ...');
-// full control:
-const res = await shared.ai.chat({ messages: [{ role: 'user', content: '...' }], system: '...' });
+
+const reply2 = await shared.ai.chat(
+  [{ role: 'user', content: '...' }],
+  { system: '...', model: '...', max_tokens: 1024 },
+);
+// returns the assistant's text (res.content), already unwrapped.
+
+// streaming — prefer this for anything long, and required for models that
+// only support streaming (some chatgpt/* routes via LiteLLM). Still resolves
+// to the full text at the end.
+const full = await shared.ai.chat(q, { stream: true, onToken: t => out.append(t) });
+
+const { url } = await shared.ai.image('a red bicycle', { size: '1024x1024' });
 ```
-The model is configured server-side (`SHARED_AI_MODEL`) — don't hardcode model
-names in site code unless the user explicitly wants to override per-call.
+Do NOT pass a single options object as the first argument — `{ messages, system }`
+is sent as the message list and the call fails.
+
+The model is configured server-side (`SHARED_AI_MODEL`; on this homelab it is
+`services.shared.aiModel` in `homelab/nixos/hosts/shared.nix`) — don't hardcode
+model names in site code unless the user explicitly wants to override per-call.
+It must name a model the LiteLLM gateway actually serves; a stale value makes
+every `chat()` call fail with a 400 that only shows up at request time.
 
 ### `shared.uploads` — file uploads
 ```js
@@ -76,9 +107,12 @@ const { url } = await shared.uploads.upload(fileInput.files[0]);  // url is serv
 ### `shared.ws` — websocket channels (realtime pub/sub between visitors)
 ```js
 const room = shared.ws.channel('lobby');
-room.onmessage = msg => { /* ... */ };
-room.send({ hello: 'world' });
+room.onMessage(msg => { /* ... */ });   // a METHOD; `room.onmessage = fn` does nothing
+room.send({ hello: 'world' });          // JSON-encoded for you
+room.close();
 ```
+`onMessage` can be called more than once — every registered listener gets each
+message. Incoming payloads are JSON-parsed when possible, else passed as a string.
 
 ### `shared.identity` — current user
 ```js
@@ -99,3 +133,11 @@ The homepage (`https://shared.tap/`) lists all deployed sites.
 - Keep it a static site — let `shared.db`/`ai`/`uploads`/`ws` be the backend.
 - Use `subscribe` for live UIs instead of polling.
 - Build the whole feature client-side; there is no server code to add.
+- The served `/shared.js` is the source of truth for signatures, and it moves
+  ahead of this file. `curl https://<site>.shared.tap/shared.js` and read the
+  function you're about to call — the callback-shaped APIs (`db.subscribe`,
+  `ws.channel`) fail silently when called wrongly, so a mismatch looks like
+  "the feature doesn't work" rather than an error.
+- Smoke-test the platform calls against the real server before assuming the
+  site is at fault: `curl -X POST https://<site>.shared.tap/api/db/<col> -H
+  'Content-Type: application/json' -d '{}'` and the same for `/api/ai/chat`.
