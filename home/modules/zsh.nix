@@ -24,6 +24,7 @@
       ggp = "git push";
 
       htop = "btop";
+      netbird = "netbird-nb0";
       nix-gc = "find ~/src -name .direnv -type d -mtime +30 -exec rm -rf {} + ; sudo nix-collect-garbage -d";
       top = "btop";
 
