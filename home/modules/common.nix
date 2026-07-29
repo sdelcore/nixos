@@ -8,7 +8,6 @@
     ./agent-skills/default.nix
     ./mcp.nix
     ./opencode/default.nix
-    ./pi/default.nix
     ./codex.nix
     ./omp.nix
     ./scripts.nix

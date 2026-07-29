@@ -11,10 +11,8 @@ let
     # (not inside any nix profile), and other system tools live in
     # /run/current-system/sw/bin and /run/wrappers/bin. A systemd
     # user service's default PATH has none of those, so we set it
-    # explicitly here. ~/.npm-global/bin is included so the pi
-    # harness (installed via `npm install -g @mariozechner/pi-coding-agent`
-    # by home/modules/pi/default.nix) is reachable too.
-    export PATH="/run/wrappers/bin:/run/current-system/sw/bin:${config.home.homeDirectory}/.nix-profile/bin:${config.home.homeDirectory}/.local/bin:${config.home.homeDirectory}/.npm-global/bin:$PATH"
+    # explicitly here.
+    export PATH="/run/wrappers/bin:/run/current-system/sw/bin:${config.home.homeDirectory}/.nix-profile/bin:${config.home.homeDirectory}/.local/bin:$PATH"
 
     # The npm-installed `claude` is a dynamically-linked ELF that
     # resolves /lib64/ld-linux-x86-64.so.2 — on NixOS that path is

@@ -7,7 +7,7 @@ let
     if builtins.pathExists path then builtins.readDir path else { };
 
   # Skills are managed by the shared agent-skills module so they're picked up
-  # by Claude, opencode, and pi from a single source.
+  # by Claude, opencode, and OMP from a single source.
 
   # Auto-discover commands: every *.md file in ./commands
   commandFileNames = lib.filterAttrs

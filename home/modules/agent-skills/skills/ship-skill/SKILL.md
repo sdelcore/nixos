@@ -9,7 +9,7 @@ End-to-end pipeline for adding a shared agent skill to the upstream
 NixOS config and rolling it out to every host. Skills land under
 `home/modules/agent-skills/skills/<name>/` and auto-symlink into
 `~/.claude/skills/<name>/` (Claude Code) and `~/.agents/skills/<name>/`
-(opencode, pi) on the next `just switch`.
+(opencode, OMP) on the next `just switch`.
 
 ## When to use
 

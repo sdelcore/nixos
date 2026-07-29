@@ -1,7 +1,7 @@
 { lib, pkgs, ... }:
 {
   # Codex reads ~/.codex/AGENTS.md as global instructions on every session;
-  # source the same file Claude Code, opencode, and pi share.
+  # source the same file Claude Code, opencode, and OMP share.
   home.file.".codex/AGENTS.md".source = ./claude-code/CLAUDE.md;
 
   # Install Codex CLI via the native installer; it self-updates with

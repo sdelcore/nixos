@@ -121,12 +121,11 @@ in
       mode = "0444";  # User-readable for opencode
     };
 
-    # LiteLLM gateway key for pi. Pi points at the self-hosted LiteLLM proxy
-    # (ai VM, http://llm.ai.tap/v1) as its single model source, so all model
-    # management lives in LiteLLM. Dedicated virtual key, scoped/revocable.
+    # LiteLLM gateway key for local coding agents. They use the self-hosted
+    # proxy (ai VM, http://llm.ai.tap/v1) as their single model source.
     secrets."litellmApiKey" = {
       reference = "op://Infrastructure/LiteLLM pi/credential";
-      mode = "0444";  # User-readable for pi
+      mode = "0444";  # User-readable for local coding agents
     };
 
     # YubiKey U2F public key
