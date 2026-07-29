@@ -21,11 +21,6 @@ let
     };
     "Qwen3.6-27B-MTP" = {
       hf = "unsloth/Qwen3.6-27B-MTP-GGUF:UD-Q4_K_XL";
-      ctx = 131072;
-      extra = "--no-mmproj --spec-type draft-mtp --spec-draft-n-max 2";
-    };
-    "Qwen3.6-27B-MTP-256K" = {
-      hf = "unsloth/Qwen3.6-27B-MTP-GGUF:UD-Q4_K_XL";
       ctx = 262144;
       gpuLayers = 50;
       extra = "--no-mmproj --spec-type draft-mtp --spec-draft-n-max 2";
