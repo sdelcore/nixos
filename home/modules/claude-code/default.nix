@@ -3,6 +3,17 @@
 let
   commandsDir = ./commands;
 
+  # `hunk` (terminal diff viewer for reviewing agent-written changesets) is
+  # only in nixpkgs unstable, not in the stable channel this host tracks.
+  # Home Manager's `pkgs` does not carry the `unstable` overlay — that overlay
+  # is applied at `nixpkgs.overlays` in mkSystem and `useGlobalPkgs` is never
+  # set — so `pkgs.unstable.hunk` is not available here. Import the unstable
+  # input directly, the same way nix/modules/software/localllm/ does.
+  unstable = import inputs.nixpkgs-unstable {
+    inherit (pkgs) system;
+    config.allowUnfree = true;
+  };
+
   readDirSafe = path:
     if builtins.pathExists path then builtins.readDir path else { };
 
@@ -33,11 +44,13 @@ let
   settingsFile = "${config.home.homeDirectory}/.claude/settings.json";
 in
 {
-  home.packages = with pkgs; [
+  home.packages = (with pkgs; [
     yq
     jq
     ripgrep
     curl
+  ]) ++ [
+    unstable.hunk
   ];
 
   home.sessionPath = [
