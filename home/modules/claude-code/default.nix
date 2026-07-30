@@ -53,12 +53,6 @@ in
 
     # Global user CLAUDE.md
     ".claude/CLAUDE.md".source = ./CLAUDE.md;
-
-    # Obsidian vault plugin
-    ".claude/plugins/obsidian" = {
-      source = ./plugins/obsidian;
-      recursive = true;
-    };
   } // commandEntries;
 
   # Deep-merge base settings into ~/.claude/settings.json on every activation.

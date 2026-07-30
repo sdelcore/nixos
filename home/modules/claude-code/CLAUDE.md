@@ -15,8 +15,7 @@ Write all replies in ASD-STE100 Simplified Technical English.
 - Do not use idioms, metaphors, or slang.
 - Use six sentences maximum per paragraph.
 
-Code, commit messages, and file contents are not affected. The
-`/caveman` skill overrides this rule while it is active.
+Code, commit messages, and file contents are not affected.
 
 ## Communication
 

@@ -119,29 +119,18 @@ After drafting, verify:
 
 ## Shipping to every host
 
-Only when the user wants the skill live, not just drafted. Shared skills live in the upstream NixOS config at
-`home/modules/agent-skills/skills/<name>/` and auto-symlink into
-`~/.claude/skills/<name>/` (Claude Code) and `~/.agents/skills/<name>/`
-(opencode, OMP) on the next `just switch`.
+Only when the user wants the skill live, not just drafted. Follow the normal
+PR and `just switch` workflow from CLAUDE.md. The skill-specific parts:
 
-1. **Find the upstream.** Run `hostname`. On `nightman`, operate locally at
-   `/home/sdelcore/src/infra/nixos`. Anywhere else, run every git and file
-   operation over `ssh sdelcore@nightman.tap` against `~/src/infra/nixos`.
-
-2. **Check for a conflict.** If `skills/<name>/` already exists, stop and ask
-   before overwriting.
-
-3. **Branch and write.** From a clean `main`, create a feature branch
-   (`add-<name>-skill`). Write `SKILL.md` plus any bundled files.
-
-4. **Commit and push.** Stage only the new files — never `git add .`. Push with `-u`.
-
-5. **Open a PR** explaining what the skill does and why. Share the URL immediately,
-   then watch CI. If a check fails, fix the root cause — never re-run blindly.
-
-6. **After merge, roll out.** On each host: `git -C ~/src/infra/nixos pull`, then
-   `just switch` with no arguments. For remote hosts run `just deploy <host> <ip>`
-   from nightman. **Never** run `just switch <foreign-hostname>` — applying another
-   host's config breaks the system.
-
-Do not edit `agent-skills/default.nix`; skills are auto-discovered via `builtins.readDir`.
+- Shared skills live at `home/modules/agent-skills/skills/<name>/` in the
+  upstream NixOS config. They auto-symlink into `~/.claude/skills/<name>/`
+  (Claude Code) and `~/.agents/skills/<name>/` (opencode, OMP) on the next
+  `just switch`.
+- Run `hostname` first. On `nightman` the upstream is local at
+  `/home/sdelcore/src/infra/nixos`. Anywhere else, run every git and file
+  operation over `ssh sdelcore@nightman.tap` against `~/src/infra/nixos`.
+- If `skills/<name>/` already exists, stop and ask before overwriting.
+- Do not edit `agent-skills/default.nix` — skills are auto-discovered via
+  `builtins.readDir`.
+- Bundled reference files sit alongside SKILL.md; the whole directory is
+  mounted recursively.
