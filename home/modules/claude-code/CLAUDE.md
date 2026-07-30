@@ -1,96 +1,54 @@
-# Development Partnership
+# Working Agreement
 
-## How I Work
+## Language
 
-- These systems run NixOS with Home Manager, managed via flakes
-- I use direnv for per-project environments — check for a root
-  `flake.nix` or `.envrc` before running commands
-- When a project has a flake, prefer `nix develop` (or letting
-  direnv load it) to keep dependencies isolated and reproducible
-- Never install tools globally when they belong in a dev shell
-- Nix flakes only see git-tracked files — always `git add`
-  new files before building
+Write all replies in ASD-STE100 Simplified Technical English.
 
-## Hosts
+- Use one word for one meaning. Do not use synonyms for variety.
+- Write short sentences. Use 20 words maximum for an instruction,
+  25 for a description.
+- Use the active voice. Write "Run the build", not "The build
+  should be run".
+- Use the present tense when you can.
+- Keep the articles. Write "the flake", not "flake".
+- Give one instruction per sentence.
+- Do not use idioms, metaphors, or slang.
+- Use six sentences maximum per paragraph.
 
-- `nightman` = desktop; also hosts the upstream nixos config at
-  `~/src/infra/nixos` (source of truth for shared modules, skills,
-  commands)
-- `dayman` = laptop
-- `workbox` = separate host built from `~/hms/workbox` on dayman,
-  layered on top of the upstream via `upstreamPath`
-
-Always check `hostname` before running any host-specific build or
-switch. Applying a foreign host config will break the system.
+Code, commit messages, and file contents are not affected.
 
 ## Communication
 
-- If anything is unclear, ask for clarification before proceeding
-- Do not make assumptions about intent, architecture, or scope
-- When there are multiple valid approaches, present the options
-  and let me choose
-- Keep responses concise — explain the why, not the obvious
+- Ask me when the request is unclear. Do not guess the intent or
+  the scope.
+- Give me the options when more than one approach is correct. Let
+  me choose.
+- Explain the reason. Do not explain the obvious.
 
-## Workflow
+## Pull requests
 
-- Research the codebase before writing code
-- For non-trivial changes with genuinely unclear approach: plan
-  first, confirm, then implement. For straightforward changes,
-  act directly
-- Verify your work — run the build, tests, or linter after changes
-- When something fails, investigate the root cause instead of
-  retrying blindly
+These rules apply to every repository. Treat `main` as protected.
 
-## Git and Commits
+- Do not commit to `main`. Create a branch, then open a PR.
+- Name the branch in short kebab-case, for example
+  `fix-stale-token-refresh`.
+- Write the PR body to explain the reason for the change. Send me
+  the URL.
+- Watch the CI checks. Find the cause of a failure. Do not re-run
+  a failed check without a fix.
+- Answer a review comment in a new commit on the branch. Tell me
+  if you disagree with it.
 
-- Follow the project's existing commit message style
-- Only commit when I explicitly ask
-- Do not push unless I explicitly ask
-- Stage specific files, not `git add .`
+## NixOS
 
-## Project Workflow & Pull Requests
-
-These rules apply to **every repository**, with no exceptions.
-Treat main as protected — go through the PR flow even when
-you're the only reviewer.
-
-- Do not commit directly to main. Create a feature branch,
-  push it, and open a PR for review
-- Branch names: short, kebab-case, descriptive of the change
-  (e.g. `fix-stale-token-refresh`, `add-search-pagination`)
-- Open the PR with a title and a body explaining the *why*,
-  then share the URL so I can review
-- After opening, monitor the PR's CI pipeline. If any check
-  fails, investigate the root cause and push a fix to the
-  branch — never re-run blindly or paper over a real failure
-- Watch the PR for review comments. When feedback lands,
-  address it in a follow-up commit on the branch. If I push
-  back on a suggestion, argue the point or take the change —
-  do not silently ignore
-- When the PR is merged, return to main and `git pull` before
-  starting follow-up work, so the next branch starts from
-  current state
-
-## Code Quality
-
-- Match the existing style and patterns of the codebase
-- Do not add comments, docstrings, or type annotations to code
-  you did not change
-- Do not refactor, rename, or "improve" surrounding code unless
-  asked
-- Prefer simple, obvious solutions over clever abstractions
-- Leave linting and formatting to tooling — do not manually fix
-  style issues that a formatter handles
-
-## Secrets and Security
-
-- Never commit tokens, keys, or credentials
-- On these systems, secrets are managed via 1Password / opnix
-  under `/var/lib/opnix/secrets/`
-- Validate inputs at system boundaries, trust internal code
-
-## Environment Context
-
-- OS: NixOS (flake-based, x86_64-linux)
-- Shell environments: direnv + nix develop
-- These are personal machines, not shared servers
+- `nightman` is the desktop. It also holds the upstream config at
+  `~/src/infra/nixos`. `dayman` is the laptop. `workbox` builds
+  from `~/hms/workbox` on dayman.
+- Run `hostname` before a build or a switch that names a host. A
+  foreign host config breaks the system.
+- A flake sees only the tracked files. Run `git add` on a new file
+  before you build.
+- Use `nix develop`, or let direnv load the shell. Do not install
+  a tool globally.
+- opnix holds the secrets in `/var/lib/opnix/secrets/`. Never
+  commit a credential.

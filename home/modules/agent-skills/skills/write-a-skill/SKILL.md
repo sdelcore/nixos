@@ -1,6 +1,6 @@
 ---
 name: write-a-skill
-description: Create new agent skills with proper structure, progressive disclosure, and bundled resources. Use when user wants to create, write, or build a new skill.
+description: Write a new agent skill, and optionally ship it to every host through the NixOS config. Use when the user wants to create, write, build, add, or deploy a skill.
 ---
 
 # Writing Skills
@@ -110,8 +110,27 @@ Split into separate files when:
 After drafting, verify:
 
 - [ ] Description includes triggers ("Use when...")
+- [ ] Description does not collide with an existing skill's triggers
 - [ ] SKILL.md under 100 lines
 - [ ] No time-sensitive info
 - [ ] Consistent terminology
 - [ ] Concrete examples included
 - [ ] References one level deep
+
+## Shipping to every host
+
+Only when the user wants the skill live, not just drafted. Follow the normal
+PR and `just switch` workflow from CLAUDE.md. The skill-specific parts:
+
+- Shared skills live at `home/modules/agent-skills/skills/<name>/` in the
+  upstream NixOS config. They auto-symlink into `~/.claude/skills/<name>/`
+  (Claude Code) and `~/.agents/skills/<name>/` (opencode, OMP) on the next
+  `just switch`.
+- Run `hostname` first. On `nightman` the upstream is local at
+  `/home/sdelcore/src/infra/nixos`. Anywhere else, run every git and file
+  operation over `ssh sdelcore@nightman.tap` against `~/src/infra/nixos`.
+- If `skills/<name>/` already exists, stop and ask before overwriting.
+- Do not edit `agent-skills/default.nix` — skills are auto-discovered via
+  `builtins.readDir`.
+- Bundled reference files sit alongside SKILL.md; the whole directory is
+  mounted recursively.
