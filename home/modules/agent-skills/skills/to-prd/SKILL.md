@@ -1,9 +1,12 @@
 ---
 name: to-prd
-description: Turn the current conversation context into a PRD and submit it as a GitHub issue. Use when user wants to create a PRD from the current context.
+description: Turn the current conversation into a PRD or a refactor plan and file it as a GitHub issue. Use when the user wants a PRD from the current context, wants to plan a refactor, or wants a refactoring RFC broken into safe incremental steps.
 ---
 
-This skill takes the current conversation context and codebase understanding and produces a PRD. Do NOT interview the user — just synthesize what you already know.
+Produce a written spec from what you already know and file it as a GitHub issue. Two shapes:
+
+- **PRD** (default, for new features) — synthesize from the conversation. Do NOT interview the user.
+- **Refactor plan** (when the work is changing existing code rather than adding capability) — interview the user first, then produce a plan of tiny commits.
 
 ## Process
 
@@ -15,7 +18,16 @@ A deep module (as opposed to a shallow module) is one which encapsulates a lot o
 
 Check with the user that these modules match their expectations. Check with the user which modules they want tests written for.
 
-3. Write the PRD using the template below and submit it as a GitHub issue.
+3. Check the codebase for test coverage of the affected area. If coverage is thin, ask the user what their testing plan is.
+
+4. **Refactor plans only** — before writing anything up:
+   - Ask for a long, detailed description of the problem and any solutions they have in mind, then verify their assertions against the code
+   - Ask whether they considered other options, and present alternatives
+   - Interview them about the implementation, in detail
+   - Pin down exact scope: what changes, and explicitly what does not
+   - Break the work into the tiniest possible commits. Per Martin Fowler: "make each refactoring step as small as possible, so that you can always see the program working." Each commit leaves the codebase working.
+
+5. Write it up using the template below and submit it as a GitHub issue. For a refactor plan, replace **User Stories** with a **Commits** section — a long, plain-English list of those tiny commits — and write Problem Statement and Solution from the developer's perspective rather than the user's.
 
 <prd-template>
 

@@ -1,11 +1,19 @@
 ---
 name: triage-issue
-description: Triage a bug or issue by exploring the codebase to find root cause, then create a GitHub issue with a TDD-based fix plan. Use when user reports a bug, wants to file an issue, mentions "triage", or wants to investigate and plan a fix for a problem.
+description: Investigate a reported bug to find its root cause, then file a GitHub issue with a TDD fix plan. Also runs multi-bug QA sessions. Use when the user reports a bug, wants to file an issue, mentions "triage" or "QA session", or wants a problem investigated and a fix planned.
 ---
 
 # Triage Issue
 
 Investigate a reported problem, find its root cause, and create a GitHub issue with a TDD fix plan. This is a mostly hands-off workflow - minimize questions to the user.
+
+## Modes
+
+**Single issue (default)** — one problem, investigated deeply, filed with a root cause and a TDD plan. Follow the Process below.
+
+**QA session** — the user has several problems to report in one sitting ("let's do QA", "I've got a few bugs"). Run the Process once per problem, but lighter: at most 2-3 clarifying questions each, and skip the TDD fix plan unless the root cause is clear. After filing each issue, print the URL and ask "Next issue, or are we done?" Keep going until they say they're done. Each issue is filed as you go — don't batch them.
+
+In a QA session, if one report covers several independent failures, split it into separate issues rather than filing one thick one. File in dependency order so you can reference real issue numbers, and mark blocking relationships honestly — if two are independent, say so, since the goal is that several people or agents can grab different issues at once.
 
 ## Process
 
@@ -97,6 +105,18 @@ A numbered list of RED-GREEN cycles:
 - [ ] All new tests pass
 - [ ] Existing tests still pass
 
+## Blocked by
+
+- Blocked by #<issue-number> (omit this section if there are no blockers)
+
 </issue-template>
+
+Rules for every issue body:
+
+- **No file paths or line numbers** — they go stale
+- **Use the project's own domain language**, taken from the codebase itself
+- **Describe behaviors, not code** — "the sync service fails to apply the patch," not "applyPatch() throws on line 42"
+- **Reproduction steps are mandatory** — if you can't determine them, ask the user
+- **Keep it readable in 30 seconds**
 
 After creating the issue, print the issue URL and a one-line summary of the root cause.

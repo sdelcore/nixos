@@ -78,4 +78,4 @@ target-date: YYYY-MM-DD
 
 **Knowledge base**: Glob `Vault/**/*.md` or grep vault-wide for content matches.
 
-**Deep research**: For queries spanning many files, use the Task tool with an Explore subagent pointed at the vault path.
+**Deep research**: For queries spanning many files, use the Agent tool with an Explore subagent pointed at the vault path.

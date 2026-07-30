@@ -1,6 +1,6 @@
 ---
 name: write-a-skill
-description: Create new agent skills with proper structure, progressive disclosure, and bundled resources. Use when user wants to create, write, or build a new skill.
+description: Write a new agent skill, and optionally ship it to every host through the NixOS config. Use when the user wants to create, write, build, add, or deploy a skill.
 ---
 
 # Writing Skills
@@ -110,8 +110,38 @@ Split into separate files when:
 After drafting, verify:
 
 - [ ] Description includes triggers ("Use when...")
+- [ ] Description does not collide with an existing skill's triggers
 - [ ] SKILL.md under 100 lines
 - [ ] No time-sensitive info
 - [ ] Consistent terminology
 - [ ] Concrete examples included
 - [ ] References one level deep
+
+## Shipping to every host
+
+Only when the user wants the skill live, not just drafted. Shared skills live in the upstream NixOS config at
+`home/modules/agent-skills/skills/<name>/` and auto-symlink into
+`~/.claude/skills/<name>/` (Claude Code) and `~/.agents/skills/<name>/`
+(opencode, OMP) on the next `just switch`.
+
+1. **Find the upstream.** Run `hostname`. On `nightman`, operate locally at
+   `/home/sdelcore/src/infra/nixos`. Anywhere else, run every git and file
+   operation over `ssh sdelcore@nightman.tap` against `~/src/infra/nixos`.
+
+2. **Check for a conflict.** If `skills/<name>/` already exists, stop and ask
+   before overwriting.
+
+3. **Branch and write.** From a clean `main`, create a feature branch
+   (`add-<name>-skill`). Write `SKILL.md` plus any bundled files.
+
+4. **Commit and push.** Stage only the new files — never `git add .`. Push with `-u`.
+
+5. **Open a PR** explaining what the skill does and why. Share the URL immediately,
+   then watch CI. If a check fails, fix the root cause — never re-run blindly.
+
+6. **After merge, roll out.** On each host: `git -C ~/src/infra/nixos pull`, then
+   `just switch` with no arguments. For remote hosts run `just deploy <host> <ip>`
+   from nightman. **Never** run `just switch <foreign-hostname>` — applying another
+   host's config breaks the system.
+
+Do not edit `agent-skills/default.nix`; skills are auto-discovered via `builtins.readDir`.
