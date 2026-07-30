@@ -1,10 +1,22 @@
-{ inputs, pkgs, ... }:
+{ inputs, config, pkgs, lib, ... }:
+
+with lib;
 
 let
+  # vLLM only makes sense on the box with a serving-class GPU. dayman's
+  # Quadro T2000 has 4 GB of VRAM, which cannot hold a useful model, and
+  # building the CUDA closure for it is pure waste. Same gate as
+  # llama-swap.nix.
+  enabled = config.networking.hostName == "nightman";
+
   unstable = import inputs.nixpkgs-unstable {
     inherit (pkgs) system;
     config = {
       allowUnfree = true;
+      # Build the CUDA variant — this is a GPU serving runtime, and the
+      # host it lands on has an RTX 4090. Pulls from cuda-maintainers
+      # (see nix.settings.substituters) rather than compiling locally.
+      cudaSupport = true;
       # vllm 0.16.0 is marked insecure. The headline issue is CVE-2026-27893
       # (RCE via trust_remote_code bypass when loading untrusted models); the
       # rest are DoS or info-leak issues that require an exposed API server.
@@ -21,22 +33,11 @@ let
     overlays = [
       (final: prev: {
         python3Packages = prev.python3Packages.overrideScope (pythonFinal: pythonPrev: {
-          # outlines is a runtime dep of vllm. It gates its test phase on
-          # `doCheck = !config.cudaSupport`, and this nixpkgs instance leaves
-          # cudaSupport at its default, so the tests are on — dragging in the
-          # whole nativeCheckInputs list, including tensorflow. tensorflow is
-          # tensorflow-bin, which only ships prebuilt wheels for interpreters
-          # upstream publishes for, and there is no python 3.14 wheel yet:
-          #   error: tensorflow-bin: unsupported configuration: x86_64-linux_314
-          # We do not care about outlines' own test suite (most of it is
-          # already disabled upstream as network-dependent), so turn the check
-          # phase off rather than flipping cudaSupport, which would silently
-          # rebuild vllm as a CUDA package. Drop this once tensorflow-bin has
-          # a 3.14 wheel.
-          outlines = pythonPrev.outlines.overridePythonAttrs (old: {
-            doCheck = false;
-            nativeCheckInputs = [ ];
-          });
+          # NOTE: outlines used to need `doCheck = false` here. It gates its
+          # tests on `doCheck = !config.cudaSupport`, and while cudaSupport was
+          # off the tests ran and dragged tensorflow-bin into the closure,
+          # which has no python 3.14 wheel. Setting cudaSupport = true above
+          # turns those tests off at the source, so the override is gone.
 
           # model-hosting-container-standards is AWS's SageMaker hosting shim,
           # pulled in as a runtime dep of vllm (so it cannot just be dropped).
@@ -83,7 +84,7 @@ let
     '';
   });
 in
-{
+mkIf enabled {
   # vLLM as a CLI only — no systemd service. vLLM pre-allocates ~90% of
   # VRAM on startup for its KV cache, so it should not run unattended.
   # Launch manually with `vllm serve <model>`.
