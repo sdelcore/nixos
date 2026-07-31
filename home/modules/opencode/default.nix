@@ -1,4 +1,25 @@
 { inputs, lib, config, pkgs, ... }:
+let
+  mcpServers = lib.mapAttrs (_: server:
+    if server ? command then {
+      type = "local";
+      command = [ server.command ] ++ (server.args or [ ]);
+      enabled = true;
+    } // lib.optionalAttrs ((server.env or { }) != { }) {
+      environment = server.env;
+    } else {
+      type = "remote";
+      inherit (server) url;
+      enabled = true;
+    } // lib.optionalAttrs ((server.headers or { }) != { }) {
+      inherit (server) headers;
+    }
+  ) config.programs.mcp.servers;
+
+  opencodeConfig = lib.recursiveUpdate
+    (builtins.fromJSON (builtins.readFile ./opencode.jsonc))
+    { mcp = mcpServers; };
+in
 {
   home.packages = with pkgs; [
     yq
@@ -26,7 +47,7 @@
     fi
   '';
 
-  home.file.".config/opencode/opencode.jsonc".source = ./opencode.jsonc;
+  home.file.".config/opencode/opencode.jsonc".text = builtins.toJSON opencodeConfig;
 
   # Share the global agent instructions with Claude Code by sourcing the
   # same CLAUDE.md file. opencode reads ~/.config/opencode/AGENTS.md as

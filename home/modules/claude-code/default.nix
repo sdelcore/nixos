@@ -32,8 +32,7 @@ let
     commandFileNames;
 
   # Base Claude Code settings, merged into ~/.claude/settings.json via jq.
-  # Using a merge rather than a symlink lets downstream hosts layer additional
-  # keys (e.g. mcpServers on workbox) through their own activation scripts.
+  # Using a merge rather than a symlink preserves user and host settings.
   settingsAttrs = {
     attribution = {
       commit = "";
