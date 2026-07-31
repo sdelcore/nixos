@@ -53,6 +53,30 @@ let
             pname = "flashinfer-python";
           });
 
+          # vllm-flash-attn's CMakeLists.txt:22 hard-codes a supported-python
+          # allowlist that stops at 3.13, and the 2026-07-29 unstable bump moved
+          # the default interpreter to 3.14. nixpkgs already patches this exact
+          # check in vllm's own CMakeLists — see vllm/default.nix, "Ignore the
+          # python version check because it hard-codes minor versions and lags
+          # behind `ray`'s python interpreter support" — but not in
+          # vllm-flash-attn, which is a separate derivation. vllm only includes
+          # that subproject under cudaSupport, so nixpkgs Hydra never reaches
+          # the stale guard.
+          #
+          # find_python_constrained_versions only compares version strings; it
+          # gates nothing else. Prepend the current interpreter, the same way
+          # nixpkgs does. Drop this once nixpkgs patches vllm-flash-attn too.
+          vllm = pythonPrev.vllm.override {
+            vllm-flash-attn = pythonPrev.vllm.vllm-flash-attn.overrideAttrs (old: {
+              postPatch = (old.postPatch or "") + ''
+                substituteInPlace CMakeLists.txt \
+                  --replace-fail \
+                    'set(PYTHON_SUPPORTED_VERSIONS' \
+                    'set(PYTHON_SUPPORTED_VERSIONS "${pythonPrev.python.pythonVersion}"'
+              '';
+            });
+          };
+
           # NOTE: outlines used to need `doCheck = false` here. It gates its
           # tests on `doCheck = !config.cudaSupport`, and while cudaSupport was
           # off the tests ran and dragged tensorflow-bin into the closure,
