@@ -49,6 +49,10 @@
             url = "github:sdelcore/wagent";
             inputs.nixpkgs.follows = "nixpkgs";
         };
+        recall = {
+            url = "github:sdelcore/recall";
+            inputs.nixpkgs.follows = "nixpkgs";
+        };
         droidcode = {
             url = "github:sdelcore/droidcode";
             inputs.nixpkgs.follows = "nixpkgs";
@@ -77,6 +81,7 @@
         voiced,
         sagent,
         wagent,
+        recall,
         droidcode,
         shared,
         zjstatus
