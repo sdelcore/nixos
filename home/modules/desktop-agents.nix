@@ -1,11 +1,13 @@
-{ config, pkgs, ... }:
+{ inputs, config, pkgs, ... }:
 
 {
   # Shared sagent + wagent setup for the interactive desktops (dayman, nightman).
   # Both run the same quota and the same LAN-exposed wagent; factored here so the
   # two host files don't drift.
   imports = [
-    ./sagent.nix
+    # sagent's module ships with its flake, so the launcher, the unit and the
+    # option schema live next to the code they run. Only policy stays here.
+    inputs.sagent.homeModules.default
     ./wagent.nix
   ];
 
