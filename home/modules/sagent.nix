@@ -1,9 +1,9 @@
 { inputs, lib, config, pkgs, osConfig, ... }:
 let
   cfg = config.services.sagent;
-  sagent = inputs.sagent.packages.${pkgs.system}.default.overrideAttrs (old: {
-    nativeBuildInputs = (old.nativeBuildInputs or []) ++ [ pkgs.git ];
-  });
+  # Upstream now carries git in its own nativeCheckInputs, so the old
+  # overrideAttrs that patched it in here is gone. Keep the plain package.
+  sagent = inputs.sagent.packages.${pkgs.system}.default;
   hostname = osConfig.networking.hostName or "unknown-host";
 
   # Optional wrapper that exports ANTHROPIC_API_KEY from a raw-content
@@ -26,7 +26,7 @@ let
 in
 {
   options.services.sagent = {
-    enable = lib.mkEnableOption "sagent — Claude Code session scribe";
+    enable = lib.mkEnableOption "sagent — coding-agent session scribe";
 
     package = lib.mkOption {
       type = lib.types.package;
@@ -73,6 +73,10 @@ in
         per-session digest AND every project rollup as one call. nightman
         and dayman share one Claude subscription quota, so the sum across
         hosts shouldn't exceed your tier's 5-hour window.
+
+        `watch-all` now sweeps opencode as well as Claude Code, so there is
+        more backlog to work through at the same rate. The cap still holds —
+        it just takes longer to catch up after a busy day.
       '';
     };
 
@@ -98,7 +102,7 @@ in
 
     systemd.user.services.sagent = {
       Unit = {
-        Description = "sagent — Claude Code session scribe";
+        Description = "sagent — coding-agent session scribe (Claude Code + opencode)";
         After = [ "default.target" ];
       };
 
@@ -107,7 +111,19 @@ in
         ExecStart = "${launcher}";
         Environment = [
           "SAGENT_OUT=${cfg.outDir}"
-          "PATH=${config.home.homeDirectory}/.local/bin:${lib.makeBinPath [ pkgs.coreutils ]}"
+          # git is a RUNTIME dependency, not just a build one: rebrand
+          # detection shells out to `git remote get-url origin`, and
+          # git_remote_url swallows the resulting OSError and returns None
+          # when git is missing. That failed silently — every project.md in
+          # the vault (49 of 49) carried `remote_url: null`, so rebrand
+          # detection had never once fired in this service.
+          #
+          # opencode is deliberately NOT added here: sagent resolves it via
+          # $OPENCODE_BIN, then ~/.opencode/bin/opencode, before consulting
+          # PATH. That installer-managed binary is the one the user actually
+          # runs, and shadowing it with a nixpkgs build could read the
+          # database with a different schema version than wrote it.
+          "PATH=${config.home.homeDirectory}/.local/bin:${lib.makeBinPath [ pkgs.coreutils pkgs.git ]}"
           "HOME=${config.home.homeDirectory}"
         ];
         Restart = "on-failure";
