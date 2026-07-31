@@ -405,11 +405,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1785508831,
-        "narHash": "sha256-N7SiXnAEjh2sBf5ttwoRqTHMP7Ns+f8Huw7S5sdNhcg=",
+        "lastModified": 1785520007,
+        "narHash": "sha256-uUUWwsD1Il17UYLEweI8w3BCG77YfEPFEupvJ23K3Pw=",
         "owner": "sdelcore",
         "repo": "sagent",
-        "rev": "6b69b371830167fc7cc4b33920fc211ae0fa24e1",
+        "rev": "9c6ecb5c4f5faa1f3c76377443f7c8f7b3e01ca7",
         "type": "github"
       },
       "original": {
@@ -536,11 +536,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784578970,
-        "narHash": "sha256-A0jtDP6BIblPShZ8ANsL1OeIMt73auVJl8irCeSThcg=",
+        "lastModified": 1785520013,
+        "narHash": "sha256-W8U1dTdllrwvthveJ2mfNbXLyo4TrFkBtxznkipWe8Q=",
         "owner": "sdelcore",
         "repo": "voiced",
-        "rev": "8d8a51cfb6a970f5fdab75807d17e1c573cbed7f",
+        "rev": "6241d0df3b1b0c9f843ba02f039694f328b99dbe",
         "type": "github"
       },
       "original": {
@@ -557,11 +557,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784599795,
-        "narHash": "sha256-mLmudOe7y4mQ0chR2apYnm5556jN1a7RBm57NOTCEtU=",
+        "lastModified": 1785520010,
+        "narHash": "sha256-fV4rsYIb61Fa6kFFci0PCF5lPDCchS1+TT1RoPtfW7A=",
         "owner": "sdelcore",
         "repo": "wagent",
-        "rev": "aad832853819337278ad5cd32a149b26b287df5a",
+        "rev": "2160101931339d79a6f25d26fc94287b6e076dd4",
         "type": "github"
       },
       "original": {

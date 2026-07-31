@@ -1,79 +1,40 @@
-{ inputs, lib, config, pkgs, ... }:
-let
-  voiced = inputs.voiced.packages.${pkgs.system}.default;
-in
+{ inputs, ... }:
+
 {
-  home.packages = [
-    voiced
-    pkgs.wtype        # For text injection
-    pkgs.wl-clipboard # For clipboard fallback
+  # voiced's module ships with its flake, so the unit and the option schema
+  # live next to the code they run. Only policy stays here.
+  imports = [
+    inputs.voiced.homeModules.default
   ];
 
-  # voiced daemon with embedded HTTP server
-  # Provides desktop mode (tray icon, hotkey toggle), HTTP API for STT/TTS
-  # Started explicitly by Hyprland via exec-once = systemctl --user start voiced
-  # HTTP API used by mem and other services that need transcription/synthesis
-  systemd.user.services.voiced = {
-    Unit = {
-      Description = "Voice Daemon (STT/TTS)";
-      After = [ "network.target" ];
-    };
+  services.voiced = {
+    enable = true;
 
-    Service = {
-      Type = "simple";
-      ExecStart = "${voiced}/bin/voiced start --http";
-      Restart = "on-failure";
-      RestartSec = 5;
-      # Environment variables for GPU support and Wayland clipboard
-      Environment = [
-        "CUDA_VISIBLE_DEVICES=0"
-        "WAYLAND_DISPLAY=wayland-1"
-        # %t = the user runtime dir (/run/user/<uid>); avoids hardcoding uid 1000.
-        "XDG_RUNTIME_DIR=%t"
-      ];
+    # Hyprland owns the lifecycle via `exec-once = systemctl --user start
+    # voiced`, so the unit must not also be pulled in at login. Starting it
+    # from the compositor keeps the STT and TTS models out of VRAM until
+    # there is a session that could use them.
+    startAtLogin = false;
+
+    # Everything voiced already defaults to is left unset on purpose; its
+    # own defaults live in src/voiced/config.py. Only the values that differ
+    # are stated here.
+    settings = {
+      # 60 rather than the upstream 15: this desktop has VRAM to spare and
+      # reloading the models costs more than holding them.
+      unload_timeout_minutes = 60;
+
+      # Upstream binds loopback. voiced has no authentication, so this opens
+      # transcription and synthesis to the whole LAN — same trust assumption
+      # as wagent in desktop-agents.nix, the home network.
+      server.host = "0.0.0.0";
+
+      # Words the model habitually mishears, matched case-insensitively on
+      # word boundaries.
+      transcription.replacements = {
+        "cloud code" = "Claude Code";
+        "hyperland" = "Hyprland";
+      };
     };
   };
-
-  # Default configuration
-  # Models are fixed in voiced 0.4.0: Parakeet-TDT v3 (STT), Kokoro-82M (TTS).
-  xdg.configFile."voiced/config.toml".text = ''
-    # Auto-unload idle STT/TTS models from the GPU after this many minutes
-    # (0 = never). Shared by both so they always match.
-    unload_timeout_minutes = 60
-
-    [transcription]
-    device = "auto"          # auto, cuda, cpu
-    language = "en"          # advisory only; Parakeet TDT v3 auto-detects
-
-    # Fix words the model habitually mishears (case-insensitive,
-    # word-boundary matched)
-    [transcription.replacements]
-    "cloud code" = "Claude Code"
-    "hyperland" = "Hyprland"
-
-    [audio]
-    sample_rate = 16000
-    channels = 1
-    device = "default"       # or specific device name
-    beep_enabled = true      # audio feedback on start/stop
-
-    [tts]
-    enabled = true              # Enable TTS (Kokoro-82M)
-    device = "auto"             # auto, cuda, cpu
-    default_voice = "af_heart"  # see `voiced voices list`
-    speed = 1.0                 # Speech rate multiplier
-
-    [diarization]
-    device = "auto"          # auto, cuda, cpu
-    similarity_threshold = 0.5  # Profile matching threshold (0-1)
-    min_segment_duration = 0.5  # Minimum segment length for embedding (seconds)
-
-    [webrtc]
-    audio_codec = "opus"     # Audio codec (opus is standard)
-    sample_rate = 48000      # WebRTC audio sample rate
-
-    [server]
-    host = "0.0.0.0"         # Accept remote connections (used by --http flag)
-    port = 8765
-  '';
 }

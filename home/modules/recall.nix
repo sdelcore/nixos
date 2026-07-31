@@ -23,7 +23,11 @@
       };
 
       sagent = {
-        path = "${config.home.homeDirectory}/Obsidian/sagent";
+        # Derived from sagent's own output setting rather than restated, so
+        # moving the digests moves the index with them. dirOf drops the
+        # per-host leaf: this collection covers every machine's digests, not
+        # only the ones written here.
+        path = builtins.dirOf config.services.sagent.outDir;
         description = "Per-host, per-project coding session digests written by sagent.";
         halfLifeDays = 30;
       };
