@@ -33,6 +33,26 @@ let
     overlays = [
       (final: prev: {
         python3Packages = prev.python3Packages.overrideScope (pythonFinal: pythonPrev: {
+          # flashinfer is a vllm dependency only under cudaSupport
+          # (vllm/default.nix guards it with `lib.optionals cudaSupport`), and
+          # its own meta sets `broken = !config.cudaSupport`. nixpkgs Hydra
+          # builds with cudaSupport off, so this derivation is never built
+          # upstream and ships with an untested packaging bug:
+          #
+          #   pname            = "flashinfer"
+          #   installed wheel  = flashinfer_python-0.6.4
+          #
+          # pythonMetadataCheckPhase looks the distribution up by $pname, so
+          # it raises PackageNotFoundError and fails the build after the ~1 h
+          # AOT kernel compile has already finished. Correcting pname to the
+          # real distribution name lets the check find the metadata and
+          # compare versions for real (0.6.4 == 0.6.4) instead of skipping it.
+          # Only the derivation name changes; nothing refers to it by pname.
+          # Drop this once nixpkgs fixes the package.
+          flashinfer = pythonPrev.flashinfer.overridePythonAttrs (_: {
+            pname = "flashinfer-python";
+          });
+
           # NOTE: outlines used to need `doCheck = false` here. It gates its
           # tests on `doCheck = !config.cudaSupport`, and while cudaSupport was
           # off the tests ran and dragged tensorflow-bin into the closure,
