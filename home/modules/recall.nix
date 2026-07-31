@@ -29,4 +29,9 @@
       };
     };
   };
+
+  programs.mcp.servers.recall = {
+    command = "${config.programs.recall.package}/bin/recall";
+    args = [ "serve" ];
+  };
 }
