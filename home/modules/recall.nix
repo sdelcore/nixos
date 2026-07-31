@@ -9,7 +9,6 @@
 
   programs.recall = {
     enable = true;
-    ollamaUrl = "http://localhost:11434";
 
     # Half-lives are MEASURED, not guessed: median chunk age is 388 days in
     # the sdelcore vault and 19 days in the sagent vault. A single shared
