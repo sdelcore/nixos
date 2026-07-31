@@ -384,11 +384,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1782790293,
-        "narHash": "sha256-Oez9ZgZdTsfvFMnJM3eGjXbksm7d8MpqB6qoFfSi6xk=",
+        "lastModified": 1785504681,
+        "narHash": "sha256-B+p3Fmnfg4tE6zSieslXIfuZC0TOawJYAq4YeDZiPW0=",
         "owner": "sdelcore",
         "repo": "sagent",
-        "rev": "83669b4c42efd759db88359a76274cc1a1354ca5",
+        "rev": "3622ceec37ee50205a4970184daf48de7cd56b1c",
         "type": "github"
       },
       "original": {
