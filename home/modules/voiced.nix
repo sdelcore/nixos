@@ -10,11 +10,12 @@
   services.voiced = {
     enable = true;
 
-    # Hyprland owns the lifecycle via `exec-once = systemctl --user start
-    # voiced`, so the unit must not also be pulled in at login. Starting it
-    # from the compositor keeps the STT and TTS models out of VRAM until
-    # there is a session that could use them.
-    startAtLogin = false;
+    # Pulled in by default.target so the HTTP API is up without a human at
+    # the keyboard -- Open WebUI on the ai VM calls it. Combined with
+    # `users.users.<name>.linger` on nightman this means "at boot", not
+    # "at login". Costs no VRAM: the inference worker spawns on the first
+    # request, not at daemon start.
+    startAtLogin = true;
 
     # Everything voiced already defaults to is left unset on purpose; its
     # own defaults live in src/voiced/config.py. Only the values that differ
