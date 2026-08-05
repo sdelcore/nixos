@@ -24,6 +24,11 @@ in
       wantedBy = [ "multi-user.target" ];
       after = [ "network-online.target" ];
       wants = [ "network-online.target" ];
+      # The exporter shells out to nvidia-smi and finds it on PATH, not by an
+      # absolute path. A systemd unit gets a minimal PATH that does not include
+      # it, so without this the service starts, stays "active", and reports
+      # nothing but `nvidia_smi_command_exit_code -1` forever.
+      path = [ config.hardware.nvidia.package.bin ];
       serviceConfig = {
         ExecStart = "${pkgs.prometheus-nvidia-gpu-exporter}/bin/nvidia_gpu_exporter --web.listen-address=:${toString port}";
         Restart = "on-failure";
