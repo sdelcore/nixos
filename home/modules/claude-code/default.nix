@@ -2,6 +2,7 @@
 
 let
   commandsDir = ./commands;
+  outputStylesDir = ./output-styles;
 
   # `hunk` (terminal diff viewer for reviewing agent-written changesets) is
   # only in nixpkgs unstable, not in the stable channel this host tracks.
@@ -31,13 +32,30 @@ let
     })
     commandFileNames;
 
+  # Auto-discover output styles: every *.md file in ./output-styles
+  outputStyleFileNames = lib.filterAttrs
+    (name: type: type == "regular" && lib.hasSuffix ".md" name)
+    (readDirSafe outputStylesDir);
+
+  outputStyleEntries = lib.mapAttrs'
+    (name: _: lib.nameValuePair ".claude/output-styles/${name}" {
+      source = outputStylesDir + "/${name}";
+    })
+    outputStyleFileNames;
+
   # Base Claude Code settings, merged into ~/.claude/settings.json via jq.
   # Using a merge rather than a symlink preserves user and host settings.
+  #
+  # `outputStyle` must match the style's `name:` frontmatter, not the file
+  # name. The style carries the Simplified Technical English rules that used
+  # to live in CLAUDE.md; the system prompt holds them better than a memory
+  # file does.
   settingsAttrs = {
     attribution = {
       commit = "";
       pr = "";
     };
+    outputStyle = "Simplified Technical English";
   };
   settingsJson = builtins.toJSON settingsAttrs;
   settingsFile = "${config.home.homeDirectory}/.claude/settings.json";
@@ -65,7 +83,7 @@ in
 
     # Global user CLAUDE.md
     ".claude/CLAUDE.md".source = ./CLAUDE.md;
-  } // commandEntries;
+  } // commandEntries // outputStyleEntries;
 
   # Deep-merge base settings into ~/.claude/settings.json on every activation.
   # Preserves user-added keys (effortLevel, enabledPlugins, etc.) and any
