@@ -54,39 +54,24 @@ in
   # global instructions on every session.
   home.file.".config/opencode/AGENTS.md".source = ../claude-code/CLAUDE.md;
 
-  # Install OpenCode via native installer
+  # Install OpenCode 2 via native installer. The v2 beta ships as a separate
+  # `opencode2` binary; the v1 `opencode` binary is removed on first activation
+  # because the `opencode` shell alias now points at opencode2.
   home.activation.installopencode = lib.hm.dag.entryAfter ["writeBoundary"] ''
     export PATH="${pkgs.curl}/bin:${pkgs.wget}/bin:${pkgs.gnutar}/bin:${pkgs.gzip}/bin:$PATH"
-    if [ ! -f "$HOME/.opencode/bin/opencode" ]; then
-      echo "Installing OpenCode..."
-      ${pkgs.curl}/bin/curl -fsSL https://opencode.ai/install | ${pkgs.bash}/bin/bash
+    if [ ! -f "$HOME/.opencode/bin/opencode2" ]; then
+      echo "Installing OpenCode 2..."
+      if ! ${pkgs.curl}/bin/curl -fsSL https://raw.githubusercontent.com/anomalyco/opencode/v2/install \
+           | ${pkgs.bash}/bin/bash -s -- --no-modify-path; then
+        echo "WARNING: OpenCode 2 install failed; rerun the switch when the network is back" >&2
+      fi
     else
-      echo "OpenCode is already installed at $HOME/.opencode/bin/opencode"
+      echo "OpenCode 2 is already installed at $HOME/.opencode/bin/opencode2"
+    fi
+
+    if [ -f "$HOME/.opencode/bin/opencode" ]; then
+      echo "Removing the OpenCode 1 binary"
+      rm -f "$HOME/.opencode/bin/opencode"
     fi
   '';
-
-  # OpenCode server with mDNS enabled for Android discovery
-  # Starts automatically on boot, can be controlled with:
-  #   systemctl --user start/stop/restart opencode-server
-  systemd.user.services.opencode-server = {
-    Unit = {
-      Description = "OpenCode Server with mDNS";
-      After = [ "network.target" ];
-    };
-
-    Service = {
-      Type = "simple";
-      # Load EXA_API_KEY from opnix secret and start server
-      ExecStart = "${pkgs.bash}/bin/bash -c 'if [ -r /var/lib/opnix/secrets/exaApiKey ]; then export EXA_API_KEY=$(${pkgs.coreutils}/bin/cat /var/lib/opnix/secrets/exaApiKey); fi; if [ -r /var/lib/opnix/secrets/litellmApiKey ]; then export LITELLM_API_KEY=$(${pkgs.coreutils}/bin/cat /var/lib/opnix/secrets/litellmApiKey); fi; exec %h/.opencode/bin/opencode serve'";
-      Restart = "on-failure";
-      RestartSec = 5;
-      # Set working directory for session context
-      WorkingDirectory = "%h";
-      Environment = [ "OPENCODE_ENABLE_EXA=true" ];
-    };
-
-    Install = {
-      WantedBy = [ "default.target" ];
-    };
-  };
 }
