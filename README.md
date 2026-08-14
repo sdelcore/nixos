@@ -31,7 +31,7 @@ There is also a `testvm` target — a throwaway VM build (GNOME desktop) used to
 - **Terminal**: Zsh + Starship, Zellij
 
 ### Agent Tooling
-- **Claude Code**, **OpenCode**, **Codex**, and **OMP** managed via Home Manager modules
+- **Claude Code**, **OpenCode**, **Codex**, **OMP**, **Herdr**, and **Orca** managed via Home Manager modules
 - Shared skills under `home/modules/agent-skills/skills/` symlink into `~/.claude/skills/` and `~/.agents/skills/`
 
 ### Security & Auth
