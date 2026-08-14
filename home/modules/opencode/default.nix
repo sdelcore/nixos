@@ -1,7 +1,5 @@
 { inputs, lib, config, pkgs, ... }:
 let
-  serverPort = 4096;
-
   mcpServers = lib.mapAttrs (_: server:
     if server ? command then {
       type = "local";
@@ -75,38 +73,5 @@ in
       echo "Removing the OpenCode 1 binary"
       rm -f "$HOME/.opencode/bin/opencode"
     fi
-
-    # ~/.config/opencode/service.json also holds a generated pairing password,
-    # so it is written by opencode itself rather than by home-manager.
-    if [ -x "$HOME/.opencode/bin/opencode2" ]; then
-      $DRY_RUN_CMD "$HOME/.opencode/bin/opencode2" service set hostname 0.0.0.0 >/dev/null
-      $DRY_RUN_CMD "$HOME/.opencode/bin/opencode2" service set port ${toString serverPort} >/dev/null
-    fi
   '';
-
-  # OpenCode 2 managed server, reachable on the LAN at :${toString serverPort}
-  # behind the pairing password from `opencode2 pair`.
-  # Starts automatically on boot, can be controlled with:
-  #   systemctl --user start/stop/restart opencode-server
-  systemd.user.services.opencode-server = {
-    Unit = {
-      Description = "OpenCode 2 Server";
-      After = [ "network.target" ];
-    };
-
-    Service = {
-      Type = "simple";
-      # Load EXA_API_KEY from opnix secret and start server
-      ExecStart = "${pkgs.bash}/bin/bash -c 'if [ -r /var/lib/opnix/secrets/exaApiKey ]; then export EXA_API_KEY=$(${pkgs.coreutils}/bin/cat /var/lib/opnix/secrets/exaApiKey); fi; if [ -r /var/lib/opnix/secrets/litellmApiKey ]; then export LITELLM_API_KEY=$(${pkgs.coreutils}/bin/cat /var/lib/opnix/secrets/litellmApiKey); fi; exec %h/.opencode/bin/opencode2 serve --service'";
-      Restart = "on-failure";
-      RestartSec = 5;
-      # Set working directory for session context
-      WorkingDirectory = "%h";
-      Environment = [ "OPENCODE_ENABLE_EXA=true" ];
-    };
-
-    Install = {
-      WantedBy = [ "default.target" ];
-    };
-  };
 }
