@@ -10,7 +10,8 @@
     ./opencode/default.nix
     ./codex.nix
     ./omp.nix
-    ./agent-runtimes.nix
+    ./herdr.nix
+    ./orca.nix
     ./scripts.nix
     ./rofi.nix
     ./zen-browser.nix

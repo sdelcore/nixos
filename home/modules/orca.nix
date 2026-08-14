@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   localBin = "$HOME/.local/bin";
   orcaDir = "$HOME/.local/share/orca";
@@ -6,31 +11,8 @@ in
 {
   home.sessionPath = [ localBin ];
 
-  # Keep these fast-moving tools outside the Nix store so their native update
-  # mechanisms can install releases without waiting for a flake update.
-  home.activation.installHerdr = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    export PATH="${localBin}:${
-      lib.makeBinPath (
-        with pkgs;
-        [
-          curl
-          coreutils
-          gawk
-        ]
-      )
-    }:$PATH"
-    if [ ! -x "${localBin}/herdr" ]; then
-      echo "Installing Herdr..."
-      ${pkgs.curl}/bin/curl -fsSL https://herdr.dev/install.sh | \
-        HERDR_INSTALL_DIR="${localBin}" ${pkgs.bash}/bin/bash
-    else
-      echo "Herdr is already installed at ${localBin}/herdr"
-    fi
-  '';
-
-  # Orca's Linux release is an AppImage. Store it in the writable home
-  # directory for Orca's built-in stable-channel updater, then execute it via
-  # appimage-run because NixOS cannot run AppImages directly.
+  # Store Orca in the writable home directory for its built-in stable-channel
+  # updater, then execute the AppImage through appimage-run on NixOS.
   home.activation.installOrca = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     export PATH="${
       lib.makeBinPath (
