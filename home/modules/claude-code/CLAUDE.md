@@ -8,9 +8,32 @@
   me choose.
 - Explain the reason. Do not explain the obvious.
 
+## Review before you hand me the work
+
+Do not hand me a finished changeset that no one but you has read.
+Run the `changeset-review` skill first. If your agent does not load
+skills, read the same steps from
+`~/.agents/skills/changeset-review/SKILL.md`.
+
+- Leave the findings as inline comments in a Hunk session, not in
+  chat. Start Hunk yourself in a Herdr pane and tell me how to
+  attach. Do not wait on me, and never run the Hunk TUI in your
+  own terminal.
+- Look up the current docs for every external API the change
+  touches. Do not trust your memory of an API.
+- Get a second read from another headless agent, whichever is on
+  PATH: `codex exec review` or `omp -p`. Use a model that is not
+  the one you are running. Ask another Herdr agent too when one
+  is up.
+- Skip the review for a typo or a one-line edit. Tell me you
+  skipped it.
+- Tell me what each reviewer found, including nothing. Never
+  report a review step you did not run.
+
 ## Pull requests
 
 These rules apply to every repository. Treat `main` as protected.
+The review above is a gate in front of the PR, not a replacement.
 
 - Do not commit to `main`. Create a branch, then open a PR.
 - Name the branch in short kebab-case, for example
