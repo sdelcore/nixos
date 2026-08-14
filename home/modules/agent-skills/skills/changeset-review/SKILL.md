@@ -22,20 +22,38 @@ running the code. Say that you skipped it and why.
 
 ## Step 1 — Get the changeset into Hunk
 
-Hunk's TUI belongs to the user. Never run `hunk diff` or `hunk show`
-yourself; those take over the terminal. You drive the live session
-through `hunk session *` only.
+Never run `hunk diff` or `hunk show` in your own terminal. Those are
+full-screen TUIs and they take over the session you are running in.
+
+Spawn one in a Herdr pane instead. The Herdr server outlives the pane,
+so the review sits there until the user attaches to it. Do not block
+waiting for them.
 
 ```bash
-hunk session list
+hunk session list                          # reuse a live session first
 ```
 
-If it prints `No active Hunk sessions.`, stop and ask the user to open
-one in their terminal:
+If it prints `No active Hunk sessions.`, start one in the background:
+
+```bash
+pane=$(herdr tab create --cwd "$PWD" --label hunk-review \
+       | jq -r '.result.root_pane.pane_id')
+herdr pane run "$pane" hunk diff main...HEAD
+hunk session list                          # confirm it registered
+```
+
+Add `--focus` to `tab create` only if the user asked to be taken there.
+Without it their current view is left alone.
+
+Then tell the user the session is up and how to reach it: attach with
+`herdr session attach <name>` from `herdr session list`, or switch to
+the `hunk-review` tab if they are already in Herdr.
+
+If no Herdr server is running (`herdr status`), fall back to asking:
 
 > Run `hunk diff main...HEAD` in the repo, then tell me when it is up.
 
-If a session is live, read the structure before the raw text:
+Once a session is live, read the structure before the raw text:
 
 ```bash
 hunk session review --repo . --json                   # files and hunks

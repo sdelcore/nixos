@@ -15,8 +15,10 @@ Run the `changeset-review` skill first. If your agent does not load
 skills, read the same steps from
 `~/.agents/skills/changeset-review/SKILL.md`.
 
-- Leave the findings as inline comments in the Hunk session I
-  opened, not in chat. Never open the Hunk TUI yourself.
+- Leave the findings as inline comments in a Hunk session, not in
+  chat. Start Hunk yourself in a Herdr pane and tell me how to
+  attach. Do not wait on me, and never run the Hunk TUI in your
+  own terminal.
 - Look up the current docs for every external API the change
   touches. Do not trust your memory of an API.
 - Get a second read from another headless agent, whichever is on
