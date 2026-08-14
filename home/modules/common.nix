@@ -1,4 +1,4 @@
-{...}: {
+{ ... }: {
   imports = [
     ./cli.nix # shared CLI toolset + catppuccin theme
     # Desktop / GUI-adjacent additions on top of the shared CLI set:
@@ -10,6 +10,7 @@
     ./opencode/default.nix
     ./codex.nix
     ./omp.nix
+    ./agent-runtimes.nix
     ./scripts.nix
     ./rofi.nix
     ./zen-browser.nix
