@@ -52,6 +52,8 @@ The review above is a gate in front of the PR, not a replacement.
   from `~/hms/workbox` on dayman.
 - Run `hostname` before a build or a switch that names a host. A
   foreign host config breaks the system.
+- Never run `just switch`, `nixos-rebuild switch`, or any equivalent
+  activation command without explicit permission in the current conversation.
 - A flake sees only the tracked files. Run `git add` on a new file
   before you build.
 - Use `nix develop`, or let direnv load the shell. Do not install
