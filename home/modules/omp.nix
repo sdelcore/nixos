@@ -6,6 +6,7 @@
 
 let
   modelsFile = "${config.home.homeDirectory}/.omp/agent/models.yml";
+  configFile = "${config.home.homeDirectory}/.omp/agent/config.yml";
   baseUrl = "http://llm.ai.tap/v1";
 in
 {
@@ -28,9 +29,55 @@ in
       echo "oh-my-pi is already installed at $HOME/.local/bin/omp"
     fi
   '';
+  # Keep user-selected models while making the durable feature profile
+  # reproducible. OMP may update this file interactively, so merge rather than
+  # replace it with a Home Manager symlink.
+  home.activation.ompSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    out="${configFile}"
+    mkdir -p "$(dirname "$out")"
+
+    managed=$(${pkgs.jq}/bin/jq -n '{
+      advisor: {
+        enabled: true,
+        syncBacklog: "off"
+      },
+      memory: {
+        backend: "mnemopi"
+      },
+      mnemopi: {
+        scoping: "per-project-tagged"
+      },
+      autolearn: {
+        enabled: true,
+        autoContinue: false
+      },
+      bashInterceptor: {
+        enabled: true
+      },
+      checkpoint: {
+        enabled: true
+      },
+      github: {
+        enabled: true
+      },
+      secrets: {
+        enabled: true
+      }
+    }')
+
+    tmp=$(mktemp)
+    if [ -f "$out" ]; then
+      ${pkgs.yq}/bin/yq -y -s '.[0] * .[1]' "$out" <(echo "$managed") > "$tmp"
+    else
+      echo "$managed" | ${pkgs.yq}/bin/yq -y . > "$tmp"
+    fi
+    mv "$tmp" "$out"
+    chmod 600 "$out"
+    echo "omp: enabled advisor, Mnemopi memory, and productivity tools in $out"
+  '';
 
   home.activation.ompLitellmProvider =
-    lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    lib.hm.dag.entryAfter [ "ompSettings" ] ''
       out="${modelsFile}"
       mkdir -p "$(dirname "$out")"
 
