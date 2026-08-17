@@ -27,27 +27,37 @@ full-screen TUIs and they take over the session you are running in.
 
 Spawn one in a Herdr pane instead. The Herdr server outlives the pane,
 so the review sits there until the user attaches to it. Do not block
-waiting for them.
+waiting for them. Each agent creates its own review session; never reuse
+another agent's Hunk session just because it covers the same repository.
+
+Name the tab after the originating agent's generated terminal title. Strip
+OMP's `π` run-state prefix and a leading task verb, then prefix the result
+with `Review ·`. This distinguishes concurrent agents reviewing the same
+working tree. Fall back to the repository directory when no agent title is
+available.
 
 ```bash
-hunk session list                          # reuse a live session first
-```
-
-If it prints `No active Hunk sessions.`, start one in the background:
-
-```bash
-pane=$(herdr tab create --cwd "$PWD" --label hunk-review \
+origin=$(herdr pane get "$HERDR_PANE_ID" \
+         | jq -r '.result.pane.terminal_title_stripped // empty')
+topic=$(printf '%s' "$origin" \
+        | sed -E 's/^π[[:space:]]+[^[:space:]]+[[:space:]]+//; s/^Explore useful[[:space:]]+//; s/^(Fix|Implement|Review|Add|Update|Create|Investigate)[[:space:]]+//')
+[ -n "$topic" ] || topic=$(basename "$PWD")
+label=$(printf 'Review · %.48s' "$topic")
+pane=$(herdr tab create --cwd "$PWD" --label "$label" \
        | jq -r '.result.root_pane.pane_id')
-herdr pane run "$pane" hunk diff main...HEAD
+herdr pane run "$pane" hunk diff
 hunk session list                          # confirm it registered
 ```
+
+Use `hunk diff` for uncommitted work. Use `hunk diff main...HEAD` only
+when the intended changeset is committed on the current branch.
 
 Add `--focus` to `tab create` only if the user asked to be taken there.
 Without it their current view is left alone.
 
 Then tell the user the session is up and how to reach it: attach with
-`herdr session attach <name>` from `herdr session list`, or switch to
-the `hunk-review` tab if they are already in Herdr.
+`herdr session attach <name>` from `herdr session list`, or switch to the
+named `Review · <topic>` tab if they are already in Herdr.
 
 If no Herdr server is running (`herdr status`), fall back to asking:
 
