@@ -21,10 +21,12 @@ skills, read the same steps from
   own terminal.
 - Look up the current docs for every external API the change
   touches. Do not trust your memory of an API.
-- Get a second read from another headless agent, whichever is on
-  PATH: `codex exec review` or `omp -p`. Use a model that is not
-  the one you are running. Ask another Herdr agent too when one
-  is up.
+- Get exactly one second read from a different model. Hunk is the inline review
+  UI, not another model review. Never run both a direct `codex exec review` or
+  `omp -p` review and a Herdr reviewer for the same changeset.
+- Never prompt, steer, resume, or reuse an existing Herdr agent for review.
+  Run the one independent reviewer as a fresh headless background process;
+  it does not need its own Herdr pane.
 - Skip the review for a typo or a one-line edit. Tell me you
   skipped it.
 - Tell me what each reviewer found, including nothing. Never

@@ -16,6 +16,8 @@ in
           curl
           coreutils
           gawk
+          git
+          openssh
         ]
       )
     }:$PATH"
@@ -30,16 +32,16 @@ in
 
   # Mirror OMP's generated OSC terminal title into the containing Herdr tab.
   home.activation.installHerdrTabTitleSync = lib.hm.dag.entryAfter [ "installHerdr" ] ''
-    export PATH="${localBin}:${lib.makeBinPath (with pkgs; [ coreutils jq ])}:$PATH"
+    export PATH="${localBin}:${lib.makeBinPath (with pkgs; [ coreutils git jq openssh ])}:$PATH"
     installedRef=$(${localBin}/herdr plugin list --plugin tab-title-sync --json 2>/dev/null \
-      | ${pkgs.jq}/bin/jq -r '.result.plugins[0].source.resolved_commit // empty')
+      | ${pkgs.jq}/bin/jq -r '.result.plugins[0].source.resolved_commit // empty' \
+      || true)
     if [ "$installedRef" != "${tabTitleSyncRef}" ]; then
-      if [ -n "$installedRef" ]; then
-        ${localBin}/herdr plugin uninstall tab-title-sync
-      fi
       echo "Installing Herdr tab title sync at ${tabTitleSyncRef}..."
-      ${localBin}/herdr plugin install lucasleon2107/herdr-tab-title-sync \
-        --ref "${tabTitleSyncRef}" --yes
+      if ! GIT_CONFIG_GLOBAL=/dev/null ${localBin}/herdr plugin install \
+        lucasleon2107/herdr-tab-title-sync --ref "${tabTitleSyncRef}" --yes; then
+        echo "warning: failed to install Herdr tab title sync; keeping the existing plugin"
+      fi
     else
       echo "Herdr tab title sync is already at ${tabTitleSyncRef}"
     fi
