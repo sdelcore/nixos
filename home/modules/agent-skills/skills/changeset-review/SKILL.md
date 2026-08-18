@@ -1,6 +1,6 @@
 ---
 name: changeset-review
-description: Review a finished changeset before it reaches the user, using a live Hunk session for inline comments, current web docs for every external API touched, and a second read from another headless agent (codex or omp). Use after finishing any non-trivial change, before opening a PR or reporting the work as done.
+description: Review a finished changeset before it reaches the user, using a live Hunk session for inline comments, current web docs for every external API touched, and exactly one independent model review. Use after finishing any non-trivial change, before opening a PR or reporting the work as done.
 ---
 
 # Changeset Review
@@ -30,38 +30,43 @@ so the review sits there until the user attaches to it. Do not block
 waiting for them. Each agent creates its own review session; never reuse
 another agent's Hunk session just because it covers the same repository.
 
-Name the tab after the originating agent's generated terminal title. Strip
-OMP's `π` run-state prefix and a leading task verb, then prefix the result
-with `Review ·`. This distinguishes concurrent agents reviewing the same
-working tree. Fall back to the repository directory when no agent title is
-available.
+First check whether this agent is running inside Herdr. Do not call pane
+commands with an empty `$HERDR_PANE_ID`.
 
 ```bash
-origin=$(herdr pane get "$HERDR_PANE_ID" \
+herdr status
+test -n "${HERDR_PANE_ID:-}"
+```
+
+If either check fails, ask the user to run the appropriate `hunk diff` command
+and tell you when it is ready. Otherwise, name the tab after the originating
+agent's generated terminal title. Strip OMP's `π` run-state prefix and a
+leading task verb, then prefix the result with `Review ·`. This distinguishes
+concurrent agents reviewing the same working tree. Fall back to the repository
+directory when no agent title is available.
+
+```bash
+originPane=$(herdr pane get "$HERDR_PANE_ID")
+origin=$(printf '%s' "$originPane" \
          | jq -r '.result.pane.terminal_title_stripped // empty')
 topic=$(printf '%s' "$origin" \
         | sed -E 's/^π[[:space:]]+[^[:space:]]+[[:space:]]+//; s/^Explore useful[[:space:]]+//; s/^(Fix|Implement|Review|Add|Update|Create|Investigate)[[:space:]]+//')
 [ -n "$topic" ] || topic=$(basename "$PWD")
+workspace=$(printf '%s' "$originPane" | jq -r '.result.pane.workspace_id')
 label=$(printf 'Review · %.48s' "$topic")
-pane=$(herdr tab create --cwd "$PWD" --label "$label" \
-       | jq -r '.result.root_pane.pane_id')
+pane=$(herdr tab create --workspace "$workspace" --cwd "$PWD" \
+       --label "$label" --no-focus | jq -r '.result.root_pane.pane_id')
 herdr pane run "$pane" hunk diff
 hunk session list                          # confirm it registered
 ```
 
 Use `hunk diff` for uncommitted work. Use `hunk diff main...HEAD` only
-when the intended changeset is committed on the current branch.
+when the intended changeset is committed on the current branch. Add `--focus`
+only if the user asked to be taken there.
 
-Add `--focus` to `tab create` only if the user asked to be taken there.
-Without it their current view is left alone.
-
-Then tell the user the session is up and how to reach it: attach with
+Tell the user the session is up and how to reach it: attach with
 `herdr session attach <name>` from `herdr session list`, or switch to the
 named `Review · <topic>` tab if they are already in Herdr.
-
-If no Herdr server is running (`herdr status`), fall back to asking:
-
-> Run `hunk diff main...HEAD` in the repo, then tell me when it is up.
 
 Once a session is live, read the structure before the raw text:
 
@@ -86,68 +91,62 @@ or two stale, and that is the defect class that survives self-review.
 Record what you checked. A claim like "the option still exists" needs the
 URL or the source file that proves it.
 
-## Step 3 — Get a second model to read it
+## Step 3 — Get exactly one second read
 
-Send the changeset to another agent running headlessly. The reviewer
-starts from a fresh context, so it cannot inherit the reasoning that
-produced the mistake. Pick a model that is not the one you are running.
+Run one external model review, not a chain of reviewers. Hunk is only the
+inline review UI; it does not count as another model review. Never run multiple
+headless reviewers for the same changeset.
 
-Match review effort to risk. Use the reviewer's default or medium effort for
-small configuration changes, narrow bug fixes, and routine features. Reserve
-high/max effort for security boundaries, destructive operations, concurrency,
-data migrations, broad architectural changes, or changes whose failure is
-hard to detect or reverse. A second read is required; maximum reasoning is not.
+The reviewer starts from a fresh context, so it cannot inherit the reasoning
+that produced the mistake. Pick a model that is not the one you are running.
 
-Do not depend on any single vendor's CLI being installed. Use whichever
-of these is on PATH.
+### Run the reviewer as a background process
 
-**Codex** has a review mode built in, so it reads the repository itself
-rather than a piped diff. Revision selectors cannot be combined with a
-custom positional prompt, so keep the command prompt-free and put standing
-review criteria in the shared instructions:
+Use exactly one available headless CLI with a model different from the active
+executor. Launch it through the host's normal background-job facility; do not
+create a Herdr tab and never prompt, steer, resume, or reuse an existing Herdr
+agent. The fresh process provides context separation without taking over the
+user's workspace.
 
-```bash
-codex exec review --base main -c model_reasoning_effort="medium"
-```
+Match effort to risk. The examples use medium. Raise it only under the risk
+criteria above.
 
-Use `--uncommitted` instead of `--base main` when the work is not
-committed yet, or `--commit <sha>` for one commit.
-
-**OMP** takes the diff on stdin. Replace `<different-reviewer-model>` with
-a model other than the active executor model:
+**Codex** reads the repository itself. Revision selectors cannot be combined
+with a custom positional prompt:
 
 ```bash
-git diff main...HEAD | omp -p --model '<different-reviewer-model>' \
-  --thinking medium 'Review this diff. Name concrete defects only: ...'
+codex exec review --uncommitted -c model_reasoning_effort="medium"
 ```
 
-Check that the diff is not empty before you pipe it. `main...HEAD` covers
-committed work only, so use plain `git diff` when the changeset is still
-uncommitted. An empty pipe produces a confident review of nothing.
+Use `--base main` for committed branch changes or `--commit <sha>` for one
+commit.
 
-Ask a narrow question rather than "review this". A narrow question gets a
-specific answer; a broad one gets a summary you already know.
-
-Treat the reply as evidence, not as a verdict. Verify each claim against
-the code before you act on it. A second model is confidently wrong at
-roughly the same rate you are.
-
-## Step 4 — Ask another agent, when one is running
-
-If Herdr has other agent panes live, send the diff to one for a third
-read:
+**Claude** can review a scoped diff from stdin with read-only tools:
 
 ```bash
-herdr agent list
-herdr agent prompt <id> 'Review the diff on branch <branch> in <repo>. Report concrete defects with file and line.'
-herdr agent wait <id> --until idle --timeout 300000
-herdr agent read <id>
+git diff -- path/to/changed/files | claude -p --effort medium \
+  --tools Read,Grep,Glob \
+  'Review this diff. Report concrete defects with file and line; no style notes.'
 ```
 
-Skip this when no other agent is running. Step 3 alone satisfies the
-second-reader requirement.
+**OMP** also accepts a diff on stdin:
 
-## Step 5 — Post the findings into Hunk
+```bash
+git diff -- path/to/changed/files | omp -p \
+  --model '<different-reviewer-model>' --thinking medium \
+  'Review this diff. Name concrete defects only; no style notes.'
+```
+
+Use plain `git diff` for uncommitted work and `git diff main...HEAD` for
+committed branch work. Scope out unrelated user changes. Verify the diff is
+non-empty before piping it. Ask a narrow question, treat the result as
+evidence, and discard findings you cannot reproduce.
+
+If the chosen reviewer cannot start or finish, report the failure. Do not
+silently run another reviewer; that recreates the duplicate-review chain this
+workflow intentionally avoids.
+
+## Step 4 — Post the findings into Hunk
 
 Put every surviving finding into the live session as one batch, so the
 user reads them inline against the code instead of in a wall of chat
@@ -174,7 +173,7 @@ Rules for the comments:
   command output.
 - Drop any finding you could not verify. Say in chat that you dropped it.
 
-## Step 6 — Report
+## Step 5 — Report
 
 Tell the user in chat:
 
