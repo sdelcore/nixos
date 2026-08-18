@@ -92,27 +92,33 @@ Send the changeset to another agent running headlessly. The reviewer
 starts from a fresh context, so it cannot inherit the reasoning that
 produced the mistake. Pick a model that is not the one you are running.
 
+Match review effort to risk. Use the reviewer's default or medium effort for
+small configuration changes, narrow bug fixes, and routine features. Reserve
+high/max effort for security boundaries, destructive operations, concurrency,
+data migrations, broad architectural changes, or changes whose failure is
+hard to detect or reverse. A second read is required; maximum reasoning is not.
+
 Do not depend on any single vendor's CLI being installed. Use whichever
 of these is on PATH.
 
 **Codex** has a review mode built in, so it reads the repository itself
-rather than a piped diff:
+rather than a piped diff. Revision selectors cannot be combined with a
+custom positional prompt, so keep the command prompt-free and put standing
+review criteria in the shared instructions:
 
 ```bash
-codex exec review --base main -c model_reasoning_effort="max" \
-  'Name concrete defects only: wrong behavior, a broken edge case, a
-   stale API, or a claim the diff does not support. Give the file and
-   line for each. If it is sound, say so in one line. No style notes.'
+codex exec review --base main -c model_reasoning_effort="medium"
 ```
 
 Use `--uncommitted` instead of `--base main` when the work is not
 committed yet, or `--commit <sha>` for one commit.
 
-**OMP** takes the diff on stdin:
+**OMP** takes the diff on stdin. Replace `<different-reviewer-model>` with
+a model other than the active executor model:
 
 ```bash
-git diff main...HEAD | omp -p --model 'litellm/chatgpt/gpt-5.6-sol' \
-  --thinking max 'Review this diff. Name concrete defects only: ...'
+git diff main...HEAD | omp -p --model '<different-reviewer-model>' \
+  --thinking medium 'Review this diff. Name concrete defects only: ...'
 ```
 
 Check that the diff is not empty before you pipe it. `main...HEAD` covers

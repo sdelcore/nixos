@@ -54,6 +54,11 @@ in
       bashInterceptor: {
         enabled: true
       },
+      bash: {
+        autoBackground: {
+          enabled: true
+        }
+      },
       checkpoint: {
         enabled: true
       },
@@ -62,6 +67,13 @@ in
       },
       secrets: {
         enabled: true
+      },
+      task: {
+        showResolvedModelBadge: true,
+        isolation: {
+          mode: "auto"
+        },
+        enableLsp: true
       }
     }')
 
