@@ -1,6 +1,6 @@
 ---
 name: changeset-review
-description: Review a finished changeset before it reaches the user, using a live Hunk session for inline comments, current web docs for every external API touched, and exactly one independent model review. Use after finishing any non-trivial change, before opening a PR or reporting the work as done.
+description: Review a finished changeset before it reaches the user. Start by removing proven unnecessary padding and comments from the changeset, then use a live Hunk session for inline comments, current web docs for every external API touched, and exactly one independent model review. Use after finishing any non-trivial change, before opening a PR or reporting the work as done.
 ---
 
 # Changeset Review
@@ -9,8 +9,8 @@ Run this after you finish a changeset and before you report the work as
 done. The point is that the changeset gets read by something other than
 the agent that wrote it. You are a poor reviewer of your own diff.
 
-Every step here is a shell command on purpose. This skill runs the same
-way under Claude Code, opencode, OMP, and Codex.
+The operational steps below use shell commands where that keeps the workflow
+portable across Claude Code, opencode, OMP, and Codex.
 
 ## When to run it
 
@@ -19,6 +19,51 @@ external API, a flag, a schema, or a version-pinned dependency.
 
 Skip it for a typo, a comment, or a one-line edit you already verified by
 running the code. Say that you skipped it and why.
+
+## Step 0 — De-slop the changeset
+
+Before opening Hunk or asking the independent reviewer, inspect the full
+changeset for padding introduced by the changeset. This is an editing pass:
+remove each artifact proven unnecessary, then re-run the changed contract or
+the most specific available smoke test. Review the resulting smaller diff, not
+the padded original.
+
+Do not claim or imply anything about the change's author. "AI slop" is only a
+search label; findings must be concrete and grounded in behavior or established
+local patterns.
+
+Preserve a comment when it carries the only useful explanation of an invariant,
+non-obvious intent, external constraint, or operational gotcha. Before
+removing a construct, apply this load-bearing question: what caller, behavior,
+test, or future reader loses essential information if it disappears? Keep it
+when the answer is concrete; remove it when nothing material is lost. When
+uncertain, preserve the code and record the question for review. Never change
+observable behavior in this pass.
+
+Remove, when unnecessary:
+
+- Comments that restate the code, narrate the diff, defend awkward code, or
+  add generic process language. Keep concise comments that explain why.
+- One-call-site wrappers, one-off helpers, aliases, types, interfaces, config
+  keys, flags, re-exports, and extensibility scaffolding added by the
+  changeset without a current requirement or meaningful domain name.
+- Redundant validation inside trusted internal paths, defensive catch blocks,
+  silent fallbacks, and swallowed errors only when no real failure mode or
+  caller requires them.
+- Dead branches, unused options, speculative TODOs, compatibility cruft, tests
+  that do not exercise a changed path, and unrelated formatting changes.
+- Language-specific escape hatches or performance ceremony without evidence,
+  such as casts to bypass types or memoization added without an identity or
+  computational need.
+
+Search nearby code before removing or replacing a pattern. Reuse an established
+local convention rather than introducing a second one. Do not clean up
+pre-existing code outside the changeset in this pass; record a separate finding
+instead.
+
+Update all affected callers and delete obsolete paths in the same pass. Verify
+the modified behavior with the changed contract test or most specific available
+smoke test before continuing to Step 1.
 
 ## Step 1 — Get the changeset into Hunk
 
@@ -178,6 +223,8 @@ Rules for the comments:
 Tell the user in chat:
 
 - What each reviewer found, and which findings survived verification.
+- What Step 0 removed, and the verification that showed each removal preserved
+  behavior.
 - What you fixed, and what you left alone with the reason.
 - Which claims you could not verify.
 
