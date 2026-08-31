@@ -37,6 +37,9 @@ in
     mkdir -p "$(dirname "$out")"
 
     managed=$(${pkgs.jq}/bin/jq -n '{
+      modelRoles: {
+        default: "litellm/chatgpt/gpt-5.6-sol:medium"
+      },
       advisor: {
         enabled: true,
         syncBacklog: "off"
