@@ -1,7 +1,21 @@
-{zjstatus, ...}: {
+{ inputs, pkgs, zjstatus, ... }:
+
+let
+  # zellij from unstable (0.44.3) so it matches zjstatus 0.24.0, which is
+  # built against zellij-tile 0.44.3. Home Manager's `pkgs` does not carry the
+  # `unstable` overlay (see claude-code/default.nix), so import the input
+  # directly, the same way lmstudio.nix does.
+  unstable = import inputs.nixpkgs-unstable {
+    inherit (pkgs) system;
+    config.allowUnfree = true;
+  };
+in
+
+{
   programs.zellij = {
     enable = true;
     enableZshIntegration = false;
+    package = unstable.zellij;
   };
 
   # Local config (Ctrl+g)

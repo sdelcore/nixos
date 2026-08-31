@@ -72,23 +72,50 @@ full-screen TUIs and they take over the session you are running in.
 
 Spawn one in a Herdr pane instead. The Herdr server outlives the pane,
 so the review sits there until the user attaches to it. Do not block
-waiting for them. Each agent creates its own review session; never reuse
-another agent's Hunk session just because it covers the same repository.
+waiting for them.
 
-First check whether this agent is running inside Herdr. Do not call pane
-commands with an empty `$HERDR_PANE_ID`.
+### Gate on being inside Herdr
+
+First confirm this agent is actually running inside a Herdr environment. If it
+is not, do not run Hunk at all: there is no pane to hold the diff, so there is
+nothing for the user to attach to.
 
 ```bash
-herdr status
-test -n "${HERDR_PANE_ID:-}"
+herdr status                     # server must be running and compatible
+test -n "${HERDR_PANE_ID:-}"     # this pane's id must be set
 ```
 
-If either check fails, ask the user to run the appropriate `hunk diff` command
-and tell you when it is ready. Otherwise, name the tab after the originating
-agent's generated terminal title. Strip OMP's `π` run-state prefix and a
-leading task verb, then prefix the result with `Review ·`. This distinguishes
-concurrent agents reviewing the same working tree. Fall back to the repository
-directory when no agent title is available.
+If either check fails, you are outside Herdr. Ask the user to run the
+`hunk diff` command themselves and paste it back, and skip Hunk entirely — put
+the findings in chat instead of inline comments. Do not create a tab, do not
+call `hunk session`, and do not report the review as live.
+
+### Find an existing review tab in this space
+
+Before creating a tab, check for one that already covers this changeset so you
+don't stack duplicate `Review ·` tabs. Resolve the current workspace from this
+pane, then list its tabs:
+
+```bash
+currentWorkspace=$(herdr pane current | jq -r '.result.pane.workspace_id')
+herdr tab list --workspace "$currentWorkspace" | jq -r '.result.tabs[].label'
+```
+
+If a `Review ·` tab for this working tree already exists in that space, reuse
+it: run the rest of this workflow (the `hunk session review`/`comment` steps)
+against it and tell the user which tab holds the findings. Create a new tab
+only when there is no existing review tab for this changeset. Never hijack a
+tab that belongs to a different agent's review.
+
+### Create the tab in the current space
+
+Name the tab after the originating agent's generated terminal title. Strip
+OMP's `π` run-state prefix and a leading task verb, then prefix the result with
+`Review ·`. This distinguishes concurrent agents reviewing the same working
+tree. Fall back to the repository directory when no agent title is available.
+Create the tab with `--workspace "$currentWorkspace"` (the space you resolved
+above), never a different one, so the review lands where the user is already
+looking.
 
 ```bash
 originPane=$(herdr pane get "$HERDR_PANE_ID")
@@ -97,9 +124,8 @@ origin=$(printf '%s' "$originPane" \
 topic=$(printf '%s' "$origin" \
         | sed -E 's/^π[[:space:]]+[^[:space:]]+[[:space:]]+//; s/^Explore useful[[:space:]]+//; s/^(Fix|Implement|Review|Add|Update|Create|Investigate)[[:space:]]+//')
 [ -n "$topic" ] || topic=$(basename "$PWD")
-workspace=$(printf '%s' "$originPane" | jq -r '.result.pane.workspace_id')
 label=$(printf 'Review · %.48s' "$topic")
-pane=$(herdr tab create --workspace "$workspace" --cwd "$PWD" \
+pane=$(herdr tab create --workspace "$currentWorkspace" --cwd "$PWD" \
        --label "$label" --no-focus | jq -r '.result.root_pane.pane_id')
 herdr pane run "$pane" hunk diff
 hunk session list                          # confirm it registered

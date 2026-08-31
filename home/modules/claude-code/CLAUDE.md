@@ -18,7 +18,10 @@ skills, read the same steps from
 - Leave the findings as inline comments in a Hunk session, not in
   chat. Start Hunk yourself in a Herdr pane and tell me how to
   attach. Do not wait on me, and never run the Hunk TUI in your
-  own terminal.
+  own terminal. Only do Hunk when you are actually running inside
+  Herdr; otherwise skip it and give me the findings in chat. Before
+  opening a Hunk review tab, check for an existing one in the
+  current space and reuse it rather than stacking duplicates.
 - Look up the current docs for every external API the change
   touches. Do not trust your memory of an API.
 - Get exactly one second read from a different model. Hunk is the inline review
