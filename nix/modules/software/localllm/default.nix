@@ -1,16 +1,11 @@
 { ... }: {
   # Local LLM tooling.
   #
-  # - vllm: package only, no service. vLLM hard-allocates VRAM on
-  #   startup, so we keep it as a CLI and let it be launched on demand
-  #   (manually for now, eventually via a control panel like
-  #   0xSero/vllm-studio once that stabilizes).
   # - unsloth-studio: FHS-wrapped upstream installer. Provides the
   #   `unsloth-studio` command (install / up / shell). No service —
-  #   launched on demand, same reasoning as vllm.
+  #   launched on demand.
   # - gpu-metrics: nvidia_gpu_exporter, scraped by the homelab Prometheus.
   imports = [
-    ./vllm.nix
     ./unsloth-studio.nix
     ./llama-swap.nix
     ./gpu-metrics.nix
