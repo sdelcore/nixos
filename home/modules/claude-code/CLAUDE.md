@@ -8,32 +8,24 @@
   me choose.
 - Explain the reason. Do not explain the obvious.
 
-## Review before you hand me the work
+## Optional diff review
 
-Do not hand me a finished changeset that no one but you has read.
-Run the `changeset-review` skill first. If your agent does not load
-skills, read the same steps from
-`~/.agents/skills/changeset-review/SKILL.md`.
+Do not interrupt normal coding work with a diff review. Run the `diff` skill
+only when I explicitly invoke `/diff` or ask for a changeset review. If your
+agent does not load skills, read the same steps from
+`~/.agents/skills/diff/SKILL.md`.
 
-- Leave the findings as inline comments in a Hunk session, not in
-  chat. Start Hunk yourself in a Herdr pane and tell me how to
-  attach. Do not wait on me, and never run the Hunk TUI in your
-  own terminal. Only do Hunk when you are actually running inside
-  Herdr; otherwise skip it and give me the findings in chat. Before
-  opening a Hunk review tab, check for an existing one in the
-  current space and reuse it rather than stacking duplicates.
-- Look up the current docs for every external API the change
-  touches. Do not trust your memory of an API.
-- Get exactly one second read from a different model. Hunk is the inline review
-  UI, not another model review. Never run both a direct `codex exec review` or
-  `omp -p` review and a Herdr reviewer for the same changeset.
-- Never prompt, steer, resume, or reuse an existing Herdr agent for review.
-  Run the one independent reviewer as a fresh headless background process;
-  it does not need its own Herdr pane.
-- Skip the review for a typo or a one-line edit. Tell me you
-  skipped it.
-- Tell me what each reviewer found, including nothing. Never
-  report a review step you did not run.
+- Open Hunk in a split pane in the current Zellij tab and leave it available for
+  me. Do not run the Hunk TUI in your own pane or create a separate tab.
+- Put verified findings in Hunk as inline comments and report every reviewer's
+  result in chat, including when they found nothing.
+- Look up the current docs for every external API the change touches. Do not
+  trust your memory of an API.
+- Get exactly one second read from a different model. Run the independent
+  reviewer as a fresh headless background process; never prompt, steer, resume,
+  or reuse an existing interactive agent for review.
+- Tell me what each reviewer found, including nothing. Never report a review
+  step you did not run.
 
 ## Pull requests
 
