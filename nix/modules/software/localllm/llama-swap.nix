@@ -9,31 +9,22 @@ let
     inherit (pkgs) system;
     config = { allowUnfree = true; cudaSupport = true; };
   };
-  llamaServer = "${unstable.llama-cpp}/bin/llama-server";
+  llamaPackage = unstable.llama-cpp.overrideAttrs (old: {
+    src = inputs.llama-cpp-qwen-flash;
+    version = "qwen4exp-mtp";
+    preConfigure = "";
+  });
+  llamaServer = "${llamaPackage}/bin/llama-server";
 
   port = 9292;
 
   models = {
-    "Qwen3.6-35B-A3B-MTP" = {
-      hf = "unsloth/Qwen3.6-35B-A3B-MTP-GGUF:UD-Q4_K_XL";
-      ctx = 262144;
-      extra = "--cpu-moe --no-mmap --image-min-tokens 1024 --spec-type draft-mtp --spec-draft-n-max 2";
-    };
-    "Qwen3.6-27B-MTP" = {
-      hf = "unsloth/Qwen3.6-27B-MTP-GGUF:UD-Q4_K_XL";
-      ctx = 262144;
-      gpuLayers = 50;
-      extra = "--no-mmproj --spec-type draft-mtp --spec-draft-n-max 2";
-    };
-    "Qwen3-8B" = {
-      hf = "unsloth/Qwen3-8B-GGUF:Q4_K_M";
-      ctx = 16384;
-      extra = "";
-    };
-    "Phi-4" = {
-      hf = "unsloth/phi-4-GGUF:Q4_K_M";
-      ctx = 16384;
-      extra = "";
+    "Qwen3.8-Flash-Next-MTP" = {
+      hf = "unsloth/Qwen3.8-Flash-Next-GGUF";
+      ctx = 32768;
+      # Leave GPU layers unset so `--fit` can maximize offload while retaining
+      # 1 GiB of headroom on the 4090.
+      extra = "--hf-file UD-Q4_K_XL/Qwen3.8-Flash-Next-UD-Q4_K_XL-00001-of-00004.gguf --spec-draft-model /home/sdelcore/.cache/huggingface/hub/models--unsloth--Qwen3.8-Flash-Next-GGUF/snapshots/38bb39ee97821de2c9009abb7e93950eec396e66/MTP/mtp-Qwen3.8-Flash-Next-Q4_K_M.gguf --spec-type draft-mtp --spec-draft-n-max 5 --fit on --fit-target 1024 -b 256 -ub 256 -t 16 --load-mode none --reasoning-preserve --reasoning-effort xhigh";
     };
     # Embedding model for the LiteLLM MCP semantic tool filter on the ai VM.
     # F16 rather than Q8_0: the file is only 1.2 GB, and quantization noise
@@ -52,7 +43,7 @@ let
   # Chat models share one flag set. An embedding model needs a different one:
   # no KV-cache quantization, because it perturbs the vectors, and the pooling
   # mode the model was trained with.
-  chatFlags = "--flash-attn on --cache-type-k q8_0 --cache-type-v q8_0 -np 1";
+  chatFlags = "--flash-attn on --cache-type-k q4_0 --cache-type-v q4_0 -np 1";
   embedFlags = m: "--embedding --pooling ${m.pooling or "last"} -ub ${toString m.ctx}";
 
   mkModel = name: m:

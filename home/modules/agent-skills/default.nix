@@ -24,7 +24,15 @@ let
 
   claudeEntries = lib.mapAttrs' (name: _: mkSkillEntry ".claude/skills" name) skillDirs;
   agentsEntries = lib.mapAttrs' (name: _: mkSkillEntry ".agents/skills" name) skillDirs;
+
+  ponytailSkillDirs = lib.filterAttrs (_: type: type == "directory") (readDirSafe "${inputs.ponytail}/skills");
+  mkPonytailEntry = base: name: lib.nameValuePair "${base}/${name}" {
+    source = "${inputs.ponytail}/skills/${name}";
+    recursive = true;
+  };
+  ponytailClaudeEntries = lib.mapAttrs' (name: _: mkPonytailEntry ".claude/skills" name) ponytailSkillDirs;
+  ponytailAgentsEntries = lib.mapAttrs' (name: _: mkPonytailEntry ".agents/skills" name) ponytailSkillDirs;
 in
 {
-  home.file = claudeEntries // agentsEntries;
+  home.file = claudeEntries // agentsEntries // ponytailClaudeEntries // ponytailAgentsEntries;
 }

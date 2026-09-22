@@ -1,6 +1,6 @@
 ---
 name: diff
-description: Review the current changeset on explicit request. Remove proven padding, open Hunk in the current Zellij tab, check current docs for external APIs, and get exactly one independent model review. Use only when the user invokes /diff or explicitly asks for a changeset review.
+description: Review the current changeset on explicit request. Remove proven padding, open Hunk beside the current agent (prefer Herdr, otherwise Zellij), check current docs for external APIs, and get exactly one independent model review. Use only when the user invokes /diff or explicitly asks for a changeset review.
 ---
 
 # Diff Review
@@ -58,28 +58,37 @@ Update all affected callers and delete obsolete paths in the same pass. Verify
 the modified behavior with the changed contract test or most specific available
 smoke test before continuing to Step 1.
 
-## Step 1 — Open Hunk in the current Zellij tab
+## Step 1 — Open Hunk beside the current agent
 
 Never run `hunk diff` or `hunk show` in your own pane. They are full-screen
-TUIs. Confirm the agent is inside Zellij, then open Hunk in a right-hand split
-of the current tab:
+TUIs. Prefer Herdr when `HERDR_ENV=1`; it is the authoritative pane manager
+even when the process also inherits Zellij variables. Split the current Herdr
+pane and run Hunk there:
 
 ```bash
-test -n "${ZELLIJ:-}"
+pane=$(herdr pane current | jq -r '.result.pane.pane_id')
+review=$(herdr pane split --pane "$pane" --direction right --cwd "$PWD" --no-focus \
+  | jq -r '.result.pane.pane_id // .result.pane_id')
+herdr pane run "$review" hunk diff
+hunk session list
+```
+
+If Herdr is unavailable but `ZELLIJ` is set, open a right-hand split in the
+current Zellij tab:
+
+```bash
 zellij action new-pane --direction right --cwd "$PWD" \
   --name "Changeset Review" -- hunk diff
 hunk session list
 ```
 
-Use `hunk diff` for uncommitted work. For committed branch work, replace the
-final command with `hunk diff main...HEAD`. The new pane must stay in the
-current tab; do not create another tab or run Hunk in the agent's pane.
+Use `hunk diff` for uncommitted work. For committed branch work, replace it
+with `hunk diff main...HEAD`. Leave the review pane available to the user.
 
-If the agent is not inside Zellij, do not launch the TUI. Inspect the complete
-scoped diff headlessly and report findings in chat with file and line references.
-Use plain `git diff` for uncommitted work and `git diff main...HEAD` for
-committed branch work. Scope out unrelated user changes.
-
+If neither Herdr nor Zellij is available, do not launch the TUI. Inspect the
+complete scoped diff headlessly and report findings in chat with file and line
+references. Use plain `git diff` for uncommitted work and `git diff main...HEAD`
+for committed branch work. Scope out unrelated user changes.
 Review every changed line for behavioral regressions, missed callsites, stale
 comments, accidental formatting churn, and missing coverage of a changed
 contract. Fix verified defects before requesting the independent review, then

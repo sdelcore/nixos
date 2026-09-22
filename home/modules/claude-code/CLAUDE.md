@@ -15,8 +15,9 @@ only when I explicitly invoke `/diff` or ask for a changeset review. If your
 agent does not load skills, read the same steps from
 `~/.agents/skills/diff/SKILL.md`.
 
-- Open Hunk in a split pane in the current Zellij tab and leave it available for
-  me. Do not run the Hunk TUI in your own pane or create a separate tab.
+- Open Hunk beside the current agent and leave it available for me. Prefer a
+  Herdr split when `HERDR_ENV=1`, even if Zellij variables are also present;
+  otherwise use a split in the current Zellij tab. Never run Hunk in your own pane.
 - Put verified findings in Hunk as inline comments and report every reviewer's
   result in chat, including when they found nothing.
 - Look up the current docs for every external API the change touches. Do not
