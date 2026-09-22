@@ -22,6 +22,7 @@
   ],
   "modules-right": [
     "custom/recorder",
+    "custom/ai-usage",
     "tray",
     "bluetooth",
     "pulseaudio",
