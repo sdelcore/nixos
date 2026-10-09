@@ -33,6 +33,9 @@ There is also a `testvm` target — a throwaway VM build (GNOME desktop) used to
 ### Agent Tooling
 - **Claude Code**, **OpenCode**, **Codex**, **OMP**, **Herdr**, and **Orca** managed via Home Manager modules
 - Shared skills under `home/modules/agent-skills/skills/` symlink into `~/.claude/skills/` and `~/.agents/skills/`
+- Kaneo MCP at `tasks.sdelcore.com` is shared by Claude Code, OpenCode, Codex, and OMP through `home/modules/mcp.nix`. The official `@kaneo/mcp` stdio server reads `/var/lib/opnix/secrets/kaneoApiKey` at launch; API keys do not authenticate the instance's HTTP MCP endpoint.
+- Store the Kaneo key in `op://Infrastructure/Kaneo MCP/credential`. opnix delivers it owner-only to `sdelcore`. To rotate, update that field, refresh opnix secrets, and restart the harnesses; no Nix credential changes are needed.
+- Waybar AI usage is provided by `ai-usagebar`. It tracks Claude and Codex; OpenCode Go is available when configured.
 
 ### Security & Auth
 - **1Password** integration

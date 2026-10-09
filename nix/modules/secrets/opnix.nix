@@ -128,6 +128,13 @@ in
       mode = "0444";  # User-readable for local coding agents
     };
 
+    # Read by the MCP launcher, never embedded in harness configs or the store.
+    secrets."kaneoApiKey" = {
+      reference = "op://Infrastructure/Kaneo MCP/credential";
+      owner = primaryUser;
+      mode = "0400";
+    };
+
     # YubiKey U2F public key
     secrets."yubikeyU2fKeys" = {
       reference = "op://Infrastructure/yubikey/u2f_keys";

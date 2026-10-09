@@ -29,16 +29,20 @@ in
       echo "oh-my-pi is already installed at $HOME/.local/bin/omp"
     fi
   '';
-  # Keep user-selected models while making the durable feature profile
-  # reproducible. OMP may update this file interactively, so merge rather than
-  # replace it with a Home Manager symlink.
+  # Keep other interactive settings, but converge model roles to the LiteLLM
+  # catalog on activation. This file remains writable for OMP itself.
   home.activation.ompSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     out="${configFile}"
     mkdir -p "$(dirname "$out")"
 
     managed=$(${pkgs.jq}/bin/jq -n '{
       modelRoles: {
-        default: "litellm/chatgpt/gpt-5.6-sol:medium"
+        default: "litellm/chatgpt/gpt-6-sol:medium",
+        advisor: "litellm/chatgpt/gpt-6-astra:medium",
+        tiny: "litellm/chatgpt/gpt-6-luna:low",
+        smol: "litellm/chatgpt/gpt-6-luna:low",
+        task: "litellm/chatgpt/gpt-6-luna:low",
+        designer: "litellm/chatgpt/gpt-6-luna:medium"
       },
       advisor: {
         enabled: true,
