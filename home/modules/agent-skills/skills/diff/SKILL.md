@@ -1,218 +1,112 @@
 ---
 name: diff
-description: Review the current changeset on explicit request. Remove proven padding, open or reuse exactly one Hunk session beside the current agent (prefer Herdr, otherwise Zellij), check current docs for external APIs, and get exactly one independent model review. Use only when the user invokes /diff or explicitly asks for a changeset review.
+description: Review changes only on explicit `/diff` or changeset-review request. Self-verify, get one fresh-context subagent review with a different model, run checks, then report in prose and ask whether to review hunks; open Hunk only on request.
 ---
 
 # Diff Review
 
 Run this workflow only when the user invokes `/diff` or explicitly asks for a
 changeset review. Do not trigger it automatically before reporting ordinary
-coding work; the user may prefer to keep moving without reviewing each diff.
+coding work.
 
-The review gets a second read from something other than the agent that wrote
-the changes. The operational steps use shell commands where that keeps the
-workflow portable across Claude Code, opencode, OMP, and Codex.
+Follow this loop in order:
 
-## Step 0 — De-slop the changeset
+1. Generate the change.
+2. Self-verify and check current documentation.
+3. Get exactly one independent review from a fresh-context subagent using a
+   different model.
+4. Run the repository's automated checks for the changed files and contract.
+5. Resolve findings and repeat the loop, or escalate a novel issue.
+6. Report in prose, then ask: **Want to review the hunks?**
 
-Before inspecting the diff or asking the independent reviewer, inspect the full
-changeset for padding introduced by the changeset. This is an editing pass:
-remove each artifact proven unnecessary, then re-run the changed contract or
-the most specific available smoke test. Review the resulting smaller diff, not
-the padded original.
+## 1. Self-verify
 
-Do not claim or imply anything about the change's author. "AI slop" is only a
-search label; findings must be concrete and grounded in behavior or established
-local patterns.
+Inspect the full changeset for proven-unnecessary padding. Remove only artifacts
+that are unnecessary, preserve comments that explain invariants, non-obvious
+intent, external constraints, or operational gotchas, and never change
+observable behavior in this pass. Search nearby code before replacing a
+pattern; follow local conventions and leave pre-existing code outside the
+changeset alone. Update affected callers and remove obsolete paths within the
+changeset.
 
-Preserve a comment when it carries the only useful explanation of an invariant,
-non-obvious intent, external constraint, or operational gotcha. Before
-removing a construct, apply this load-bearing question: what caller, behavior,
-test, or future reader loses essential information if it disappears? Keep it
-when the answer is concrete; remove it when nothing material is lost. When
-uncertain, preserve the code and record the question for review. Never change
-observable behavior in this pass.
+Re-run the most specific check after the pass. Also run the repository's own
+build, test, and format commands that apply to the touched files.
 
-Remove, when unnecessary:
+For every external API, CLI flag, config key, or module option the changeset
+touches, look up current documentation. Record the URL or source file that
+proves the claim. Do not rely on memory. If documentation cannot be checked,
+record that limitation.
 
-- Comments that restate the code, narrate the diff, defend awkward code, or
-  add generic process language. Keep concise comments that explain why.
-- One-call-site wrappers, one-off helpers, aliases, types, interfaces, config
-  keys, flags, re-exports, and extensibility scaffolding added by the
-  changeset without a current requirement or meaningful domain name.
-- Redundant validation inside trusted internal paths, defensive catch blocks,
-  silent fallbacks, and swallowed errors only when no real failure mode or
-  caller requires them.
-- Dead branches, unused options, speculative TODOs, compatibility cruft, tests
-  that do not exercise a changed path, and unrelated formatting changes.
-- Language-specific escape hatches or performance ceremony without evidence,
-  such as casts to bypass types or memoization added without an identity or
-  computational need.
+## 2. Independent review
 
-Search nearby code before removing or replacing a pattern. Reuse an established
-local convention rather than introducing a second one. Do not clean up
-pre-existing code outside the changeset in this pass; record a separate finding
-instead.
+Spawn exactly one read-only subagent in the same agent runtime and working tree,
+with a fresh context and a model explicitly different from the one that wrote
+the change. For example, in OMP use its native subagent/task facility with a
+model override. Do not use a different CLI or harness, start another interactive
+agent, or prompt or steer the user's panes.
 
-Update all affected callers and delete obsolete paths in the same pass. Verify
-the modified behavior with the changed contract test or most specific available
-smoke test before continuing to Step 1.
+Give the reviewer the scoped diff: `git diff` for uncommitted work or
+`git diff main...HEAD` for committed branch work. Ask only for concrete defects
+with file and line references; no style notes. Scope out unrelated user
+changes. Verify each finding against the code, docs, or command output; discard
+unreproducible findings and record why. An empty review is valid.
 
-## Step 1 — Open or reuse Hunk beside the current agent
+If the subagent cannot start or finish, report that. Do not substitute another
+harness or run another reviewer.
 
-Never run `hunk diff` or `hunk show` in your own pane; they are full-screen
-TUIs. Prefer Herdr whenever `HERDR_ENV=1`, even if Zellij variables are also
-set. Before opening anything, inspect the existing panes and live Hunk sessions.
-If a Hunk pane for this repository already exists, reuse it: reload that session
-with the desired diff instead of creating another pane. If a Hunk session is
-already live for this repository but is not visible in the current pane layout,
-do not open a duplicate; report that it exists and tell the user how to surface
-it. Only create a pane when neither an existing pane nor live session can be
-reused. If pane/session inspection fails (including an incompatible Hunk daemon),
-do not assume there is no session and do not open another pane; report the error.
+## 3. Automated checks
 
-For Herdr, inspect with `herdr pane list` and `hunk session list --json`. Match
-the repository root, then use `hunk session reload --repo "$PWD" -- diff` for
-uncommitted work or `hunk session reload --repo "$PWD" -- diff main...HEAD` for
-committed branch work. If there is no existing Hunk pane/session, split the
-current Herdr pane and run Hunk there:
+Run the repository's real checks for the changed files and behavior (for
+example, `just fmt`, a host build for Nix changes, or the relevant test/smoke
+check for a changed contract). Cached or "up-to-date" output is not evidence;
+the check must execute. Record the commands and actual results. If a confirmed
+finding is fixed, rerun the affected checks.
 
-```bash
-pane=$(herdr pane current | jq -r '.result.pane.pane_id')
-review=$(herdr pane split --pane "$pane" --direction right --cwd "$PWD" --no-focus \
-  | jq -r '.result.pane.pane_id // .result.pane_id')
-herdr pane run "$review" hunk diff
-```
+## 4. Decide and loop
 
-If Herdr is unavailable but `ZELLIJ` is set, check `hunk session list --json`
-first and reuse/reload a live session for this repository rather than launching
-another. Only if none exists, open a right-hand split in the current Zellij tab:
+- **Resolvable:** concrete and fixable without a product, design, or contract
+  decision. Fix it, then return to generating the change and repeat the full
+  workflow. Allow at most two iterations; on a third iteration, treat the issue
+  as novel and escalate.
+- **Novel:** requires a human decision or cannot be resolved safely. Do not
+  guess; proceed to the human report and question.
+- **All clear:** proceed to the human report and question.
 
-```bash
-zellij action new-pane --direction right --cwd "$PWD" \
-  --name "Changeset Review" -- hunk diff
-```
+## 5. Report, then ask
 
-Use `hunk diff` for uncommitted work. For committed branch work, replace it
-with `hunk diff main...HEAD`. Leave the single review pane available to the user.
+In chat, report plainly:
 
-If neither Herdr nor Zellij is available, do not launch the TUI. Inspect the
-complete scoped diff headlessly and report findings in chat with file and line
-references. Use plain `git diff` for uncommitted work and `git diff main...HEAD`
-for committed branch work. Scope out unrelated user changes.
-Review every changed line for behavioral regressions, missed callsites, stale
-comments, accidental formatting churn, and missing coverage of a changed
-contract. Fix verified defects before requesting the independent review, then
-rerun the most specific check.
+- What changed and why, in one short paragraph; do not dump the diff.
+- What self-verification removed and which check proved each removal safe.
+- What the reviewer found, which findings survived verification, and which
+  were dropped and why.
+- Which automated checks actually ran and their results.
+- What could not be verified.
+- Residual risk in one line.
 
-## Step 2 — Check the docs, do not trust your memory
+Then ask exactly one question: **Want to review the hunks?**
 
-For every external API, CLI flag, config key, or module option the
-changeset touches, look up the current documentation. Use whatever web
-search or fetch tool you have. If you have none, use `curl` against the
-upstream docs or the source.
+- **Yes:** open or reuse exactly one Hunk pane beside the current agent, then
+  stop for the human. If `HERDR_ENV=1`, inspect `herdr pane list` and
+  `hunk session list --json`; reuse a live session for this repository if one
+  exists, otherwise split the current pane and run `hunk diff` for uncommitted
+  work or `hunk diff main...HEAD` for committed branch work. If Herdr is
+  unavailable but `ZELLIJ` is set, reuse a live session or open a right-hand
+  split in the current tab. If neither exists, report the findings in chat
+  with file and line references instead of launching a TUI. Put surviving
+  reviewer findings into the session with one `hunk session comment apply`
+  batch. Do not open the PR behind the human's back.
+- **No:** proceed to the PR, or ship under the working agreement. Follow the
+  repository's PR rules.
 
-This step exists because model memory of an API is frequently a version
-or two stale, and that is the defect class that survives self-review.
-
-Record what you checked. A claim like "the option still exists" needs the
-URL or the source file that proves it.
-
-## Step 3 — Get exactly one second read
-
-Run one external model review, not a chain of reviewers. Never run multiple
-headless reviewers for the same changeset.
-
-The reviewer starts from a fresh context, so it cannot inherit the reasoning
-that produced the mistake. Pick a model that is not the one you are running.
-
-### Run the reviewer as a background process
-
-Use exactly one available headless CLI with a model different from the active
-executor. Launch it through the host's normal background-job facility; never
-prompt, steer, resume, or reuse an existing interactive agent. The fresh process
-provides context separation without taking over the user's workspace.
-
-Match effort to risk. The examples use medium. Raise it only under the risk
-criteria above.
-
-**Codex** reads the repository itself. Revision selectors cannot be combined
-with a custom positional prompt:
-
-```bash
-codex exec review --uncommitted -c model_reasoning_effort="medium"
-```
-
-Use `--base main` for committed branch changes or `--commit <sha>` for one
-commit.
-
-**Claude** can review a scoped diff from stdin with read-only tools:
-
-```bash
-git diff -- path/to/changed/files | claude -p --effort medium \
-  --tools Read,Grep,Glob \
-  'Review this diff. Report concrete defects with file and line; no style notes.'
-```
-
-**OMP** also accepts a diff on stdin:
-
-```bash
-git diff -- path/to/changed/files | omp -p \
-  --model '<different-reviewer-model>' --thinking medium \
-  'Review this diff. Name concrete defects only; no style notes.'
-```
-
-Use plain `git diff` for uncommitted work and `git diff main...HEAD` for
-committed branch work. Scope out unrelated user changes. Verify the diff is
-non-empty before piping it. Ask a narrow question, treat the result as
-evidence, and discard findings you cannot reproduce.
-
-If the chosen reviewer cannot start or finish, report the failure. Do not
-silently run another reviewer; that recreates the duplicate-review chain this
-workflow intentionally avoids.
-
-## Step 4 — Reconcile and publish the findings
-
-Verify each finding from the self-review and independent reviewer against the
-code, current documentation, or command output. Fix every confirmed defect and
-rerun the affected check. Drop findings that cannot be reproduced, but report
-that they were dropped and why.
-
-When the Hunk session is available, put every surviving finding into it as one
-batch so the user can read the comments against the changed lines:
-
-```bash
-printf '%s' '{"comments":[
-  {"filePath":"path/to/file.nix","newLine":42,
-   "summary":"Stale option name","author":"codex",
-   "rationale":"Upstream renamed this; see <url>."}
-]}' | hunk session comment apply --repo . --stdin
-```
-
-Each comment needs `filePath`, `summary`, and exactly one target: `hunk`,
-`oldLine`, or `newLine`. Put evidence in `rationale` and identify the reviewer
-in `author`. Also report every reviewer's result and all surviving findings in
-chat with file and line references, whether or not Hunk was available.
-
-## Step 5 — Report
-
-Tell the user in chat:
-
-- What each reviewer found, and which findings survived verification.
-- What Step 0 removed, and the verification that showed each removal preserved
-  behavior.
-- What you fixed, and what you left alone with the reason.
-- Which claims you could not verify.
-
-Then follow the pull-request rules in the working agreement. The review
-is a gate in front of the PR, not a replacement for it.
+If the human does not answer, treat that as **No** only when the working
+agreement allows shipping without review; otherwise leave the work staged and
+stop.
 
 ## Honesty rules
 
-These matter more than the mechanics.
-
-- A review that finds nothing is a valid result. Report it plainly.
-  Do not invent a finding to look thorough.
-- Never report a step as run when it was not run. If the second model timed out,
-  say so.
-- Do not soften a real defect because you wrote the code.
+- A review that finds nothing is a valid result. Report it plainly; never
+  invent a finding to look thorough.
+- Never report a step as run when it was not. Report an unavailable reviewer,
+  skipped check, or unverified claim accurately.
+- Never soften a real defect because you wrote the code.
