@@ -98,14 +98,23 @@ Then ask exactly one question: **Want to review the hunks?**
 
 - **Yes:** open or reuse exactly one Hunk pane beside the current agent, then
   stop for the human. If `HERDR_ENV=1`, inspect `herdr pane list` and
-  `hunk session list --json`; reuse a live session for this repository if one
-  exists, otherwise split the current pane and run `hunk diff` for uncommitted
-  work or `hunk diff main...HEAD` for committed branch work. If Herdr is
-  unavailable but `ZELLIJ` is set, reuse a live session or open a right-hand
-  split in the current tab. If neither exists, report the findings in chat
-  with file and line references instead of launching a TUI. Put surviving
-  reviewer findings into the session with one `hunk session comment apply`
-  batch. Do not open the PR behind the human's back.
+  `hunk session list --json`; match the repository root and reuse a visible
+  Hunk pane by reloading its session with `hunk session reload --repo "$PWD" --
+  diff` for uncommitted work or `hunk session reload --repo "$PWD" -- diff
+  main...HEAD` for committed branch work. If a live session exists but is not
+  visible in the pane layout, do not open a duplicate; report that it exists
+  and tell the user how to surface it. Only when inspection succeeds and shows
+  no reusable session, split the current pane and run `hunk diff` for
+  uncommitted work or `hunk diff main...HEAD` for committed branch work. If
+  pane/session inspection fails, do not assume there is no session or open
+  another pane; report the error. If Herdr is unavailable but `ZELLIJ` is set,
+  inspect `hunk session list --json` and apply the same reuse, reload, and
+  inspection-failure rules; only when no live session exists, open a right-hand
+  split in the current tab. If neither Herdr nor Zellij exists, report the
+  findings in chat with file and line references instead of launching a TUI.
+  Put surviving reviewer findings into the session with one
+  `hunk session comment apply` batch. Do not open the PR behind the human's
+  back.
 - **No:** proceed to the PR, or ship under the working agreement. Follow the
   repository's PR rules.
 
@@ -115,8 +124,10 @@ stop.
 
 ## Honesty rules
 
+These matter more than the mechanics.
+
 - A review that finds nothing is a valid result. Report it plainly.
   Do not invent a finding to look thorough.
-- Never report a step as run when it was not. If the second model timed out,
+- Never report a step as run when it was not run. If the second model timed out,
   say so.
 - Do not soften a real defect because you wrote the code.
