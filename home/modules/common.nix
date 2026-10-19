@@ -1,7 +1,5 @@
 { ... }: {
   imports = [
-    ./cli.nix # shared CLI toolset + catppuccin theme
-    # Desktop / GUI-adjacent additions on top of the shared CLI set:
     ./alacritty.nix
     ./ssh.nix
     ./bottom.nix

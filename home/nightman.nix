@@ -8,6 +8,7 @@
     ./modules/hyprland/desktop.nix
     ./modules/1password.nix
     ./modules/desktop-agents.nix # sagent + wagent (shared with dayman)
+    ./modules/hermes-desktop.nix
     ./modules/recall.nix
   ];
 
