@@ -1,6 +1,6 @@
 ---
 name: diff
-description: Review the current changeset on explicit request. Remove proven padding, open Hunk beside the current agent (prefer Herdr, otherwise Zellij), check current docs for external APIs, and get exactly one independent model review. Use only when the user invokes /diff or explicitly asks for a changeset review.
+description: Review the current changeset on explicit request. Remove proven padding, open or reuse exactly one Hunk session beside the current agent (prefer Herdr, otherwise Zellij), check current docs for external APIs, and get exactly one independent model review. Use only when the user invokes /diff or explicitly asks for a changeset review.
 ---
 
 # Diff Review
@@ -58,32 +58,43 @@ Update all affected callers and delete obsolete paths in the same pass. Verify
 the modified behavior with the changed contract test or most specific available
 smoke test before continuing to Step 1.
 
-## Step 1 — Open Hunk beside the current agent
+## Step 1 — Open or reuse Hunk beside the current agent
 
-Never run `hunk diff` or `hunk show` in your own pane. They are full-screen
-TUIs. Prefer Herdr when `HERDR_ENV=1`; it is the authoritative pane manager
-even when the process also inherits Zellij variables. Split the current Herdr
-pane and run Hunk there:
+Never run `hunk diff` or `hunk show` in your own pane; they are full-screen
+TUIs. Prefer Herdr whenever `HERDR_ENV=1`, even if Zellij variables are also
+set. Before opening anything, inspect the existing panes and live Hunk sessions.
+If a Hunk pane for this repository already exists, reuse it: reload that session
+with the desired diff instead of creating another pane. If a Hunk session is
+already live for this repository but is not visible in the current pane layout,
+do not open a duplicate; report that it exists and tell the user how to surface
+it. Only create a pane when neither an existing pane nor live session can be
+reused. If pane/session inspection fails (including an incompatible Hunk daemon),
+do not assume there is no session and do not open another pane; report the error.
+
+For Herdr, inspect with `herdr pane list` and `hunk session list --json`. Match
+the repository root, then use `hunk session reload --repo "$PWD" -- diff` for
+uncommitted work or `hunk session reload --repo "$PWD" -- diff main...HEAD` for
+committed branch work. If there is no existing Hunk pane/session, split the
+current Herdr pane and run Hunk there:
 
 ```bash
 pane=$(herdr pane current | jq -r '.result.pane.pane_id')
 review=$(herdr pane split --pane "$pane" --direction right --cwd "$PWD" --no-focus \
   | jq -r '.result.pane.pane_id // .result.pane_id')
 herdr pane run "$review" hunk diff
-hunk session list
 ```
 
-If Herdr is unavailable but `ZELLIJ` is set, open a right-hand split in the
-current Zellij tab:
+If Herdr is unavailable but `ZELLIJ` is set, check `hunk session list --json`
+first and reuse/reload a live session for this repository rather than launching
+another. Only if none exists, open a right-hand split in the current Zellij tab:
 
 ```bash
 zellij action new-pane --direction right --cwd "$PWD" \
   --name "Changeset Review" -- hunk diff
-hunk session list
 ```
 
 Use `hunk diff` for uncommitted work. For committed branch work, replace it
-with `hunk diff main...HEAD`. Leave the review pane available to the user.
+with `hunk diff main...HEAD`. Leave the single review pane available to the user.
 
 If neither Herdr nor Zellij is available, do not launch the TUI. Inspect the
 complete scoped diff headlessly and report findings in chat with file and line

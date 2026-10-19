@@ -44,6 +44,9 @@ in
         task: "litellm/chatgpt/gpt-6-luna:low",
         designer: "litellm/chatgpt/gpt-6-luna:medium"
       },
+      compaction: {
+        thresholdTokens: 400000
+      },
       advisor: {
         enabled: true,
         syncBacklog: "off"
