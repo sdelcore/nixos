@@ -21,13 +21,23 @@ Follow this loop in order:
 
 ## 1. Self-verify
 
-Inspect the full changeset for proven-unnecessary padding. Remove only artifacts
-that are unnecessary, preserve comments that explain invariants, non-obvious
-intent, external constraints, or operational gotchas, and never change
-observable behavior in this pass. Search nearby code before replacing a
-pattern; follow local conventions and leave pre-existing code outside the
-changeset alone. Update affected callers and remove obsolete paths within the
-changeset.
+Inspect the full changeset for padding introduced by the changeset. This is an
+editing pass: remove each artifact proven unnecessary, then re-run the changed
+contract or the most specific available smoke test. Review the resulting
+smaller diff, not the padded original.
+
+Preserve a comment when it carries the only useful explanation of an invariant,
+non-obvious intent, external constraint, or operational gotcha. Before
+removing a construct, apply this load-bearing question: what caller, behavior,
+test, or future reader loses essential information if it disappears? Keep it
+when the answer is concrete; remove it when nothing material is lost. When
+uncertain, preserve the code and record the question for review. Never change
+observable behavior in this pass.
+
+Search nearby code before removing or replacing a pattern. Reuse an established
+local convention rather than introducing a second one. Do not clean up
+pre-existing code outside the changeset in this pass; record a separate finding
+instead. Update affected callers and delete obsolete paths in the same pass.
 
 Re-run the most specific check after the pass. Also run the repository's own
 build, test, and format commands that apply to the touched files.
@@ -105,8 +115,8 @@ stop.
 
 ## Honesty rules
 
-- A review that finds nothing is a valid result. Report it plainly; never
-  invent a finding to look thorough.
-- Never report a step as run when it was not. Report an unavailable reviewer,
-  skipped check, or unverified claim accurately.
-- Never soften a real defect because you wrote the code.
+- A review that finds nothing is a valid result. Report it plainly.
+  Do not invent a finding to look thorough.
+- Never report a step as run when it was not. If the second model timed out,
+  say so.
+- Do not soften a real defect because you wrote the code.
