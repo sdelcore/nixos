@@ -29,6 +29,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     # applications
+    hermes-agent = {
+      url = "github:NousResearch/hermes-agent";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     nur = {
       url = "github:nix-community/NUR";
       inputs.nixpkgs.follows = "nixpkgs";
