@@ -1,6 +1,6 @@
 { ... }: {
   imports = [
-    ./alacritty.nix
+    ./cli.nix # shared CLI toolset + catppuccin theme
     ./ssh.nix
     ./bottom.nix
     ./agent-skills/default.nix
@@ -10,7 +10,7 @@
     ./omp.nix
     ./herdr.nix
     ./orca.nix
-    ./scripts.nix
+    ./claude-code/default.nix
     ./rofi.nix
     ./zen-browser.nix
   ];

@@ -1,37 +1,14 @@
 { inputs, ... }:
 
 {
-  # voiced's module ships with its flake, so the unit and the option schema
-  # live next to the code they run. Only policy stays here.
-  imports = [
-    inputs.voiced.homeModules.default
-  ];
+  imports = [ inputs.voiced.homeModules.default ];
 
   services.voiced = {
     enable = true;
-
-    # Pulled in by default.target so the HTTP API is up without a human at
-    # the keyboard -- Open WebUI on the ai VM calls it. Combined with
-    # `users.users.<name>.linger` on nightman this means "at boot", not
-    # "at login". Costs no VRAM: the inference worker spawns on the first
-    # request, not at daemon start.
     startAtLogin = true;
-
-    # Everything voiced already defaults to is left unset on purpose; its
-    # own defaults live in src/voiced/config.py. Only the values that differ
-    # are stated here.
     settings = {
-      # 60 rather than the upstream 15: this desktop has VRAM to spare and
-      # reloading the models costs more than holding them.
       unload_timeout_minutes = 60;
-
-      # Upstream binds loopback. voiced has no authentication, so this opens
-      # transcription and synthesis to the whole LAN — same trust assumption
-      # as wagent in desktop-agents.nix, the home network.
       server.host = "0.0.0.0";
-
-      # Words the model habitually mishears, matched case-insensitively on
-      # word boundaries.
       transcription.replacements = {
         "cloud code" = "Claude Code";
         "hyperland" = "Hyprland";

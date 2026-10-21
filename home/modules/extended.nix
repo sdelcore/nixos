@@ -6,7 +6,6 @@
     ../modules/go.nix
     ../modules/lazydocker.nix
     ../modules/lmstudio.nix
-    ../modules/voiced.nix
   ];
   home.packages = [ pkgs.mattermost-desktop ];
 }
