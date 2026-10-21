@@ -6,6 +6,7 @@
     ./modules/common.nix
     ./modules/extended.nix
     ./modules/hyprland/desktop.nix
+    ./modules/voiced.nix
     ./modules/1password.nix
     ./modules/desktop-agents.nix # sagent + wagent (shared with dayman)
     ./modules/hermes-desktop.nix

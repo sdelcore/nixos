@@ -465,11 +465,11 @@
     "ponytail": {
       "flake": false,
       "locked": {
-        "lastModified": 1789396482,
-        "narHash": "sha256-PES5XrSYx0VBXWVHEDRykGy0SAmJfV/luzy8Gfg0aAQ=",
+        "lastModified": 1792288514,
+        "narHash": "sha256-sVnxA4rfxa2SlS2g+2+q3odRq0VJz1z7PEVHW2QRPQI=",
         "owner": "DietrichGebert",
         "repo": "ponytail",
-        "rev": "e3ba2aa6f1e6f0bc4d69eb09c9f0d0a93af56156",
+        "rev": "09c434ab73ca43761c5d8b0c5d341926c2fba710",
         "type": "github"
       },
       "original": {

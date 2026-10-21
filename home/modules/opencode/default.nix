@@ -4,13 +4,13 @@ let
     if server ? command then {
       type = "local";
       command = [ server.command ] ++ (server.args or [ ]);
-      enabled = true;
+      disabled = false;
     } // lib.optionalAttrs ((server.env or { }) != { }) {
       environment = server.env;
     } else {
       type = "remote";
       inherit (server) url;
-      enabled = true;
+      disabled = false;
     } // lib.optionalAttrs ((server.headers or { }) != { }) {
       inherit (server) headers;
     }
@@ -18,7 +18,7 @@ let
 
   opencodeConfig = lib.recursiveUpdate
     (builtins.fromJSON (builtins.readFile ./opencode.jsonc))
-    { mcp = mcpServers; };
+    { mcp = { servers = mcpServers; }; };
 in
 {
   home.packages = with pkgs; [
@@ -54,24 +54,17 @@ in
   # global instructions on every session.
   home.file.".config/opencode/AGENTS.md".source = ../claude-code/CLAUDE.md;
 
-  # Install OpenCode 2 via native installer. The v2 beta ships as a separate
-  # `opencode2` binary; the v1 `opencode` binary is removed on first activation
-  # because the `opencode` shell alias now points at opencode2.
-  home.activation.installopencode = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    export PATH="${pkgs.curl}/bin:${pkgs.wget}/bin:${pkgs.gnutar}/bin:${pkgs.gzip}/bin:$PATH"
-    if [ ! -f "$HOME/.opencode/bin/opencode2" ]; then
+  # OpenCode 2 uses the same `opencode` path as V1; upgrade an existing V1 install.
+  home.activation.installopencode = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    export PATH="${pkgs.curl}/bin:${pkgs.gnutar}/bin:${pkgs.gzip}/bin:$PATH"
+    if [ ! -x "$HOME/.opencode/bin/opencode" ]; then
       echo "Installing OpenCode 2..."
-      if ! ${pkgs.curl}/bin/curl -fsSL https://raw.githubusercontent.com/anomalyco/opencode/v2/install \
+      if ! ${pkgs.curl}/bin/curl -fsSL https://opencode.ai/v2/install \
            | ${pkgs.bash}/bin/bash -s -- --no-modify-path; then
         echo "WARNING: OpenCode 2 install failed; rerun the switch when the network is back" >&2
       fi
     else
-      echo "OpenCode 2 is already installed at $HOME/.opencode/bin/opencode2"
-    fi
-
-    if [ -f "$HOME/.opencode/bin/opencode" ]; then
-      echo "Removing the OpenCode 1 binary"
-      rm -f "$HOME/.opencode/bin/opencode"
+      echo "OpenCode is installed at $HOME/.opencode/bin/opencode"
     fi
   '';
 }
