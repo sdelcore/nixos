@@ -12,7 +12,7 @@ in
 {
   # omp loads ~/.omp/agent/AGENTS.md as global instructions; share the same
   # file Claude Code, opencode, and codex use.
-  home.file.".omp/agent/AGENTS.md".source = ./claude-code/CLAUDE.md;
+  home.file.".omp/agent/AGENTS.md".source = ./claude-code/AGENTS.md;
 
   # Install omp via the native installer. --binary pins the standalone-binary
   # path so the installer never falls back to a bun-based source install; it
