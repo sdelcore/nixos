@@ -13,6 +13,7 @@ let
     src = inputs.llama-cpp-qwen-flash;
     version = "qwen4exp-mtp";
     preConfigure = "";
+    npmDepsHash = "sha256-2Q7XhaLAArmviOLdQsNbYTfdyDE5pW9lR26cRHEVl9k=";
   });
   llamaServer = "${llamaPackage}/bin/llama-server";
 

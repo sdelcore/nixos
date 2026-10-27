@@ -155,7 +155,7 @@
             config.allowUnfree = true;
           };
           extraSpecialArgs = {
-            inherit username;
+            inherit inputs username;
             zjstatus = inputs.zjstatus.packages.${system}.default;
           };
           modules = [

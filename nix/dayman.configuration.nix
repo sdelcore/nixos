@@ -1,4 +1,4 @@
-{ ... }: {
+{ pkgs, ... }: {
   imports = [
     ./hardware/dayman.nix
     ./disks/dayman.nix
@@ -23,6 +23,8 @@
     supportedFeatures = [ "nixos-test" "benchmark" "big-parallel" "kvm" ];
   }];
   nix.settings.builders-use-substitutes = true;
+
+  environment.systemPackages = [ pkgs.unstable.moonlight-qt ];
 
   system.stateVersion = "24.05";
 }

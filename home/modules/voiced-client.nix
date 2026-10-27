@@ -1,9 +1,18 @@
-{ config, lib, ... }:
+{ inputs, pkgs, ... }:
 
 {
-  imports = [ ./voiced.nix ];
-
-  # Keep the shared service identity so the compositor's restart reaches the tray client.
-  systemd.user.services.voiced.Service.ExecStart = lib.mkForce
-    "${config.services.voiced.package}/bin/voiced client --server http://nightman.tap:8765";
+  systemd.user.services.voiced-client = {
+    Unit = {
+      Description = "Voiced client";
+      Wants = [ "network-online.target" ];
+      After = [ "network-online.target" ];
+    };
+    Service = {
+      ExecStart = "${
+        inputs.voiced.packages.${pkgs.stdenv.hostPlatform.system}.default
+      }/bin/voiced client --server http://nightman.tap:8765";
+      Restart = "on-failure";
+    };
+    Install.WantedBy = [ "default.target" ];
+  };
 }
