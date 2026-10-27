@@ -1,7 +1,7 @@
 { ... }: {
   imports = [
     ../modules/desktop/default.nix
-    ../modules/desktop/hyprland.nix
+    ./desktop-session.nix
     ../modules/hardware/nvidia.nix
     ../modules/hardware/yubikey.nix
     ../modules/hardware/ledger.nix

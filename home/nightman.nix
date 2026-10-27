@@ -4,6 +4,7 @@
   imports = [
     ./modules/base.nix
     ./modules/common.nix
+    ./modules/desktop-policy.nix
     ./modules/extended.nix
     ./modules/hyprland/desktop.nix
     ./modules/voiced.nix
@@ -28,7 +29,10 @@
         Description = "Headless Orca runtime server";
         Requires = [ "orca-xvfb.service" ];
         Wants = [ "network-online.target" ];
-        After = [ "network-online.target" "orca-xvfb.service" ];
+        After = [
+          "network-online.target"
+          "orca-xvfb.service"
+        ];
       };
       Service = {
         Environment = [

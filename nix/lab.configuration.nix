@@ -1,10 +1,15 @@
-{ lib, pkgs, primaryUser, ... }: {
+{
+  lib,
+  pkgs,
+  primaryUser,
+  ...
+}:
+{
   imports = [
     ./hardware/lab.nix
     ./disks/lab.nix
     ./profiles/base.nix
-    ./modules/desktop/hyprland.nix
-    ./modules/desktop/services.nix
+    ./profiles/desktop-session.nix
   ];
 
   networking.hostName = "lab";
@@ -23,7 +28,10 @@
   };
   xdg.portal = {
     enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-hyprland pkgs.xdg-desktop-portal-gtk ];
+    extraPortals = [
+      pkgs.xdg-desktop-portal-hyprland
+      pkgs.xdg-desktop-portal-gtk
+    ];
   };
 
   # Idle: screen off after 15 min, suspend after 30. The base profile

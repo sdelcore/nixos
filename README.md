@@ -1,98 +1,56 @@
 # NixOS Configuration
 
-## 🖥️ Hosts
+Flake-based NixOS configurations for `dayman`, `nightman`, and `lab`, with shared system modules and Home Manager environments.
 
-| Host | Role | CPU | GPU | Storage | Features |
-|------|------|-----|-----|---------|----------|
-| **dayman** | Laptop | Intel | NVIDIA | NVMe (disko) | TLP, Thunderbolt, Lid controls |
-| **nightman** | Desktop | AMD | NVIDIA | NVMe + drives (imperative) | Triple monitors, Virtualization |
-| **lab** | SBC / lab box | — | — | SATA (disko) | Minimal Hyprland, firewall off |
+## Hosts
 
-There is also a `testvm` target — a throwaway VM build (GNOME desktop) used to test config changes; it is not a physical host.
+| Host | Role | Hardware | Notable configuration |
+|------|------|----------|------------------------|
+| `dayman` | Laptop | Intel CPU, NVIDIA GPU | NVMe (Disko), TLP, Thunderbolt, lid controls |
+| `nightman` | Desktop | AMD CPU, NVIDIA GPU | NVMe and additional drives, triple monitors, virtualization |
+| `lab` | SBC / lab box | — | SATA (Disko), minimal Hyprland; firewall disabled |
 
-## 🚀 Features
+`testvm` is a throwaway GNOME VM target for testing host configurations; it is not a physical host.
 
-### System Architecture
-- **NixOS 25.11** with Flakes
-- **Disko** for declarative disk partitioning
-- **Home Manager** for user environments
+## Agent tooling
 
-### Desktop Environment
-- **Hyprland** (Wayland compositor) with extensive customization
-- **Catppuccin Macchiato** theme throughout
-- **Waybar**, **Wofi**, **SwayNC** for desktop utilities
-- GNOME is also available (used by the `testvm` target)
+Claude Code, OpenCode, Codex, OMP, Herdr, and Orca are managed with Home Manager. Shared skills live in `home/modules/agent-skills/skills/` and are linked for supported agents. `ai-usagebar` provides Claude and Codex usage in Waybar; OpenCode Go is available when configured.
 
-### Development Stack
-- **Editors**: Cursor, VS Code, Neovim (LazyVim), Claude Code
-- **Languages**: Python, Node.js, Go
-- **Tools**: Git, Direnv, FZF, Ripgrep, Bat
-- **Containers**: Docker, Libvirt/QEMU
-- **Terminal**: Zsh + Starship, Zellij
+## Commands
 
-### Agent Tooling
-- **Claude Code**, **OpenCode**, **Codex**, **OMP**, **Herdr**, and **Orca** managed via Home Manager modules
-- Shared skills under `home/modules/agent-skills/skills/` symlink into `~/.claude/skills/` and `~/.agents/skills/`
-- Kaneo MCP at `tasks.sdelcore.com` is shared by Claude Code, OpenCode, Codex, and OMP through `home/modules/mcp.nix`. The official `@kaneo/mcp` stdio server reads `/var/lib/opnix/secrets/kaneoApiKey` at launch; API keys do not authenticate the instance's HTTP MCP endpoint.
-- Store the Kaneo key in `op://Infrastructure/Kaneo MCP/credential`. opnix delivers it owner-only to `sdelcore`. To rotate, update that field, refresh opnix secrets, and restart the harnesses; no Nix credential changes are needed.
-- Waybar AI usage is provided by `ai-usagebar`. It tracks Claude and Codex; OpenCode Go is available when configured.
-
-### Security & Auth
-- **1Password** integration
-- **YubiKey** support (PAM U2F)
-- **opnix** (1Password-backed) for secret management
-- **NetBird** mesh VPN (see `nix/modules/network/netbird.nix`)
-
-## 🛠️ Usage
-
-### Quick Commands
 ```bash
-just update              # Update flake inputs
-just switch              # Apply configuration (current host)
-just build hostname      # Build a specific host without applying
-just deploy host ip      # Remote deployment
-just testvm hostname     # Boot a host config in a throwaway VM
-just testvm-headless h   # Same, headless with SSH on a forwarded port
+just update                 # Update flake inputs
+just build <host>           # Build a host without applying it
+just switch                 # Apply the current host configuration
+just deploy <host> <ip>     # Deploy to a remote host
+just testvm <host>          # Build and boot a host configuration in a throwaway VM
+just testvm-headless <host> # Same, headless with SSH on a forwarded port
+just buildvm <host>         # Build and run the VM
+just testvm-build <host>    # Build the VM only; do not run it
 ```
 
-### Initial Setup
-1. Clone repository
-2. Update hardware configuration for your system
-3. Run `just switch hostname`
-4. **Change default password immediately**: `passwd`
+For initial setup, clone the repository, configure the machine's hardware, and build the intended host before applying it. Only switch a configuration when authorized and appropriate for that machine. Change the default password immediately with `passwd`.
 
-### Maintenance
-- **Updates**: `just update` then `just switch`
-- **Garbage collection**: Runs automatically (daily, 3-day retention)
-- **VM testing**: `just buildvm hostname`, or `just testvm hostname` to boot it
+Garbage collection runs daily with three-day retention.
 
-> Each host pins its own `system.stateVersion` (set at install time and intentionally left alone per host — it is not a "current NixOS version" and should not be bumped on upgrade).
+Each host's `system.stateVersion` is set at installation and should not be changed during routine upgrades; it does not indicate the current NixOS release.
 
-## 📁 Structure
+## Structure
 
-```
+```text
 .
-├── flake.nix                # Entry point, defines hosts via mkSystem
+├── flake.nix              # Flake entry point and host definitions
 ├── nix/
-│   ├── <host>.configuration.nix   # Per-host system config
-│   ├── modules/             # System modules (common, desktop, hardware, software, virtualization)
-│   ├── disks/               # Disko layouts
-│   ├── hardware/            # Per-host hardware configs
-│   ├── profiles/            # Reusable system profiles
-│   └── users/               # User definitions
+│   ├── <host>.configuration.nix
+│   ├── modules/           # Shared system modules
+│   ├── disks/             # Disko layouts
+│   ├── hardware/          # Host hardware configuration
+│   ├── profiles/          # Reusable system profiles
+│   └── users/             # User definitions
 └── home/
-    ├── <host>.nix           # Per-host Home Manager config
-    ├── modules/             # Home Manager modules (shell, editors, desktop apps)
-    │   ├── agent-skills/    # Shared SKILL.md set for coding agents
-    │   ├── claude-code/     # Claude Code commands, plugins, settings
-    │   ├── opencode/
-    │   ├── omp.nix          # OMP coding agent and LiteLLM discovery
-    │   └── hyprland/
-    ├── configs/             # Application dotfiles
+    ├── <host>.nix         # Host Home Manager configuration
+    ├── modules/            # Home Manager modules
+    ├── configs/            # Application dotfiles
     ├── scripts/
     └── wallpapers/
 ```
-
----
-
-<a href="https://www.buymeacoffee.com/sdelcore" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
