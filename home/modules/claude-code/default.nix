@@ -81,8 +81,9 @@ in
     ".claude/todos/.keep".text = "";
     ".claude/statsig/.keep".text = "";
 
-    # Global user CLAUDE.md
-    ".claude/CLAUDE.md".source = ./CLAUDE.md;
+    # Claude Code and other agents share one user instruction file.
+    ".claude/AGENTS.md".source = ./AGENTS.md;
+    ".claude/CLAUDE.md".source = ./AGENTS.md;
   } // commandEntries // outputStyleEntries;
 
   # Deep-merge base settings into ~/.claude/settings.json on every activation.

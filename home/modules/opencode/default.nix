@@ -49,10 +49,9 @@ in
 
   home.file.".config/opencode/opencode.jsonc".text = builtins.toJSON opencodeConfig;
 
-  # Share the global agent instructions with Claude Code by sourcing the
-  # same CLAUDE.md file. opencode reads ~/.config/opencode/AGENTS.md as
-  # global instructions on every session.
-  home.file.".config/opencode/AGENTS.md".source = ../claude-code/CLAUDE.md;
+  # Share the global agent instructions across Claude Code and OpenCode.
+  # OpenCode reads ~/.config/opencode/AGENTS.md as global instructions.
+  home.file.".config/opencode/AGENTS.md".source = ../claude-code/AGENTS.md;
 
   # OpenCode 2 uses the same `opencode` path as V1; upgrade an existing V1 install.
   home.activation.installopencode = lib.hm.dag.entryAfter [ "writeBoundary" ] ''

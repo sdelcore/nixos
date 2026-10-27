@@ -2,7 +2,7 @@
 {
   # Codex reads ~/.codex/AGENTS.md as global instructions on every session;
   # source the same file Claude Code, opencode, and OMP share.
-  home.file.".codex/AGENTS.md".source = ./claude-code/CLAUDE.md;
+  home.file.".codex/AGENTS.md".source = ./claude-code/AGENTS.md;
 
   # Install Codex CLI via the native installer; it self-updates with
   # `codex update`. ~/.local/bin is prepended to PATH so the installer's
