@@ -37,18 +37,19 @@ in
 
     managed=$(${pkgs.jq}/bin/jq -n '{
       modelRoles: {
-        default: "litellm/chatgpt/gpt-6-sol:medium",
-        advisor: "litellm/chatgpt/gpt-6-astra:medium",
+        default: "litellm/chatgpt/gpt-6-luna:high",
+        advisor: "litellm/chatgpt/gpt-6.1-sol:medium",
         tiny: "litellm/chatgpt/gpt-6-luna:low",
         smol: "litellm/chatgpt/gpt-6-luna:low",
         task: "litellm/chatgpt/gpt-6-luna:low",
-        designer: "litellm/chatgpt/gpt-6-luna:medium"
+        designer: "litellm/chatgpt/gpt-6.1-sol:medium",
+        slow: "litellm/chatgpt/gpt-6.1-sol:medium",
       },
       compaction: {
         thresholdTokens: 400000
       },
       advisor: {
-        enabled: true,
+        enabled: false,
         syncBacklog: "off"
       },
       memory: {
