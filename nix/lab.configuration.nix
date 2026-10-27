@@ -3,6 +3,8 @@
     ./hardware/lab.nix
     ./disks/lab.nix
     ./profiles/base.nix
+    ./modules/desktop/hyprland.nix
+    ./modules/desktop/services.nix
   ];
 
   networking.hostName = "lab";
@@ -11,31 +13,34 @@
   # to 2C:F7:F1:20:0F:C7 (e.g. `wakeonlan` from any LAN host).
   networking.interfaces.enp3s0.wakeOnLan.enable = true;
 
-  # Minimal Sway session for the web-search browser: greetd auto-logs
-  # straight into sway on the console, no display manager.
-  environment.systemPackages = [ pkgs.chromium ];
+  # Match the other desktops: GDM prompts for login before starting Hyprland.
   hardware.graphics.enable = true;
-  programs.sway = {
+  services.xserver.enable = true;
+  services.displayManager.gdm.enable = true;
+  programs.hyprland = {
     enable = true;
     xwayland.enable = true;
   };
-  services.greetd = {
+  xdg.portal = {
     enable = true;
-    settings.default_session = {
-      command = "${pkgs.sway}/bin/sway";
-      user = primaryUser;
-    };
+    extraPortals = [ pkgs.xdg-desktop-portal-hyprland pkgs.xdg-desktop-portal-gtk ];
   };
 
   # Idle: screen off after 15 min, suspend after 30. The base profile
   # disables the sleep targets, so re-enable them for this host.
   systemd.targets.sleep.enable = lib.mkForce true;
   systemd.targets.suspend.enable = lib.mkForce true;
-  environment.etc."sway/config.d/idle.conf".text = ''
-    exec swayidle -w \
-      timeout 900 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
-      timeout 1800 'systemctl suspend'
-  '';
+  environment.systemPackages = with pkgs; [
+    chromium
+    ghostty
+    hypridle
+    hyprlock
+    polkit_gnome
+    grim
+    slurp
+    swappy
+    xfce.thunar
+  ];
 
   # No opnix token on this box — local password instead of 1Password.
   services.onepassword-secrets.enable = lib.mkForce false;

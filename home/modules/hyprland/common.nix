@@ -31,6 +31,11 @@ in {
       default = false;
       description = "Whether to enable automatic suspend after 30 minutes";
     };
+    nvidia = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Whether this session uses NVIDIA-specific environment variables";
+    };
   };
 
   config = {
@@ -220,12 +225,13 @@ in {
   };
 
   home.sessionVariables = {
-    GBM_BACKEND = "nvidia-drm";
     LIBSEAT_BACKEND = "logind";
-    LIBVA_DRIVER_NAME = "nvidia";
     QT_QPA_PLATFORM = "wayland";
     WLR_NO_HARDWARE_CURSORS = "1";
     XDG_SESSION_TYPE = "wayland";
+  } // lib.optionalAttrs cfg.nvidia {
+    GBM_BACKEND = "nvidia-drm";
+    LIBVA_DRIVER_NAME = "nvidia";
     __GLX_VENDOR_LIBRARY_NAME = "nvidia";
     __GL_GSYNC_ALLOWED = "1";
   };

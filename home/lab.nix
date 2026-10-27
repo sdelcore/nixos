@@ -1,7 +1,8 @@
 { config, pkgs, ... }:
 
 {
-    imports = [
-        ./headless.nix
-    ];
+  imports = [
+    ./headless.nix
+    ./modules/hyprland/lab.nix
+  ];
 }
