@@ -9,7 +9,7 @@ let
     inherit (pkgs) system;
     config = { allowUnfree = true; cudaSupport = true; };
   };
-  llamaPackage = unstable.llama-cpp.overrideAttrs (old: {
+  llamaPackage = (unstable.llama-cpp.override { cudaPackages = unstable.cudaPackages_12; }).overrideAttrs (old: {
     src = inputs.llama-cpp-qwen-flash;
     version = "qwen4exp-mtp";
     preConfigure = "";
