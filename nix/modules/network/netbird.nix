@@ -43,10 +43,15 @@ in
       port               = 51820;
       autoStart          = true;
       openFirewall       = true;
+      # Tailscale drops local traffic sourced from NetBird's CGNAT address.
+      dns-resolver.address = "127.0.0.153";
       login.enable       = true;
       login.setupKeyFile = "/var/lib/opnix/secrets/netbirdSetupKey";
       login.systemdDependencies = [ "opnix-secrets.service" ];
     };
+
+    # NetBird's DNS forwarder must bind port 53 for systemd-resolved.
+    systemd.services."netbird-nb0".serviceConfig.AmbientCapabilities = [ "CAP_NET_BIND_SERVICE" ];
 
     # The daemon's socket lives in /run/netbird-nb0 (RuntimeDirectoryMode=0750,
     # group netbird-nb0). netbird-ui runs as the desktop user, so without this
