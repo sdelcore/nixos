@@ -16,6 +16,8 @@ Flake-based NixOS configurations for `dayman`, `nightman`, and `lab`, with share
 
 Claude Code, OpenCode, Codex, OMP, Herdr, and Orca are managed with Home Manager. Shared skills live in `home/modules/agent-skills/skills/` and are linked for supported agents. `ai-usagebar` provides Claude and Codex usage in Waybar; OpenCode Go is available when configured.
 
+NetBird clients use a loopback DNS listener on `127.0.0.153:53` so Tailscale's CGNAT filtering does not block local DNS replies. The NetBird service needs `CAP_NET_BIND_SERVICE` to bind that port.
+
 ## Commands
 
 ```bash
