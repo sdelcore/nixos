@@ -1,4 +1,4 @@
-{ pkgs, primaryUser, ... }: {
+{ config, inputs, pkgs, primaryUser, ... }: {
   imports = [
     ./hardware/nightman.nix
     ./profiles/base.nix
@@ -9,6 +9,12 @@
   ];
 
   networking.hostName = "nightman";
+  # Use the current production driver with this host's configured kernel.
+  hardware.nvidia.package = ((import inputs.nixpkgs-unstable {
+    inherit (pkgs) system;
+    config.allowUnfree = true;
+  }).linuxPackagesFor config.boot.kernelPackages.kernel).nvidiaPackages.production;
+  boot.extraModulePackages = [ config.hardware.nvidia.package.mod ];
   networking.wireless.enable = false;
 
   # Start this user's systemd instance at boot instead of at first login, so

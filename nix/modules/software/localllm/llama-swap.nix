@@ -9,12 +9,7 @@ let
     inherit (pkgs) system;
     config = { allowUnfree = true; cudaSupport = true; };
   };
-  llamaPackage = unstable.llama-cpp.overrideAttrs (old: {
-    src = inputs.llama-cpp-qwen-flash;
-    version = "qwen4exp-mtp";
-    preConfigure = "";
-    npmDepsHash = "sha256-2Q7XhaLAArmviOLdQsNbYTfdyDE5pW9lR26cRHEVl9k=";
-  });
+  llamaPackage = unstable.llama-cpp.override { cudaPackages = unstable.cudaPackages_12; };
   llamaServer = "${llamaPackage}/bin/llama-server";
 
   port = 9292;

@@ -18,6 +18,21 @@ Claude Code, OpenCode, Codex, OMP, Herdr, and Orca are managed with Home Manager
 
 NetBird clients use a loopback DNS listener on `127.0.0.153:53` so Tailscale's CGNAT filtering does not block local DNS replies. The NetBird service needs `CAP_NET_BIND_SERVICE` to bind that port.
 
+## Voiced
+
+Both `dayman` and `nightman` run the single Voiced desktop client. It records
+locally and uses LiteLLM at `http://llm.ai.tap/v1` through the standalone Voiced
+audio server on Nightman (`http://nightman.tap:8765/v1`). The configured models
+are `nightman/stt-1` for transcription, `nightman/tts-1` for speech, and `realy`
+for the assistant. These names must be available through LiteLLM.
+
+The Home Manager hotkeys are `Super+R` for dictation and `Super+Shift+R` for
+assistant push-to-talk. Client services read the LiteLLM API key from the local
+secret `/var/lib/opnix/secrets/litellmApiKey` at startup; the key is not
+embedded in the Nix store or written to logs. Nightman's standalone server
+listens on `0.0.0.0:8765` to serve the LiteLLM audio routes. Deployment or
+activation of these configuration changes requires explicit authorization.
+
 ## Commands
 
 ```bash
