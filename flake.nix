@@ -31,7 +31,8 @@
     # applications
     hermes-agent = {
       url = "github:NousResearch/hermes-agent";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
+      # Hermes patches patchelf 0.19; newer unstable defaults to 0.15.
+      inputs.nixpkgs.url = "github:nixos/nixpkgs/3ec636362e1816bc2f0888fa0fa2c69f1bc9e504";
     };
     nur = {
       url = "github:nix-community/NUR";
@@ -75,10 +76,6 @@
     };
     ponytail = {
       url = "github:DietrichGebert/ponytail";
-      flake = false;
-    };
-    llama-cpp-qwen-flash = {
-      url = "github:danielhanchen/llama.cpp/qwen4exp/mtp";
       flake = false;
     };
   };
